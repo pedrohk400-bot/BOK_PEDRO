@@ -4,31 +4,72 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BOK</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
 
-<div id="login">
+<div class="page">
+
+<div id="login" class="card">
 <h2>تسجيل الدخول</h2>
+
 <input id="email" type="email" placeholder="البريد الإلكتروني">
+
 <input id="password" type="password" placeholder="كلمة المرور">
-<button onclick="login()">دخول</button>
-<p id="loginMsg"></p>
+
+<button id="loginBtn">دخول</button>
+
+<div id="loginMsg" class="message"></div>
 </div>
 
-<div id="app" style="display:none">
-<h2>البحث عن حساب</h2>
-<input id="account" maxlength="7" inputmode="numeric" placeholder="رقم الحساب">
-<button onclick="search()">بحث</button>
-<p id="msg"></p>
 
-<div id="result" style="display:none">
-<p>الحساب: <b id="rAccount"></b></p>
-<p>الاسم: <b id="rName"></b></p>
-<p>الحالة: <b id="rActive"></b></p>
-<p>الاشتراك: <b id="rSub"></b></p>
-<p>البداية: <b id="rStart"></b></p>
-<p>النهاية: <b id="rEnd"></b></p>
+<div id="app" class="card hidden">
+
+<h2>البحث عن حساب</h2>
+
+<input
+id="account"
+type="text"
+inputmode="numeric"
+maxlength="7"
+placeholder="رقم الحساب">
+
+<button id="searchBtn">بحث</button>
+
+<div id="msg" class="message"></div>
+
+<div id="result" class="result hidden">
+
+<div class="item">
+<span>رقم الحساب</span>
+<strong id="rAccount">-</strong>
+</div>
+
+<div class="item">
+<span>الاسم</span>
+<strong id="rName">-</strong>
+</div>
+
+<div class="item">
+<span>الحالة</span>
+<strong id="rActive">-</strong>
+</div>
+
+<div class="item">
+<span>الاشتراك</span>
+<strong id="rSub">-</strong>
+</div>
+
+<div class="item">
+<span>البداية</span>
+<strong id="rStart">-</strong>
+</div>
+
+<div class="item">
+<span>النهاية</span>
+<strong id="rEnd">-</strong>
+</div>
 
 <select id="period">
 <option value="1">يوم واحد</option>
@@ -38,75 +79,21 @@
 <option value="365">12 شهر</option>
 </select>
 
-<button onclick="renew()">تجديد</button>
+<button id="renewBtn">تجديد الاشتراك</button>
+
 </div>
+</div>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="./app.js"></script>
+
+<script src="./app.js?v=10"></script>
 
 </body>
-</html>        <button
-            id="searchButton"
-            type="button"
-        >
-            بحث
-        </button>
-
-
-        <div
-            id="searchMessage"
-            class="message"
-        ></div>
-
-
-        <!-- RESULT -->
-        <div id="result" class="result hidden">
-
-            <div class="resultTitle">
-                بيانات الحساب
-            </div>
-
-
-            <div class="item">
-
-                <span>
-                    رقم الحساب
-                </span>
-
-                <strong id="resultAccount">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="item">
-
-                <span>
-                    الاسم
-                </span>
-
-                <strong id="resultName">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="item">
-
-                <span>
-                    الحالة
-                </span>
-
-                <strong id="resultStatus">
-                    -
-                </strong>
-
-            </div>
+</html>            </div>
 
 
             <div class="item">
