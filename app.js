@@ -351,14 +351,14 @@ function showSuccessDialog(
 
             '<div class="ios-dialog-title">' +
 
-                'تم التجديد بنجاح' +
+                'تم تجديد الاشتراك بنجاح' +
 
             '</div>' +
 
 
             '<div class="ios-dialog-message">' +
 
-                'تم تمديد اشتراك الحساب بنجاح' +
+                ' تم تمديد الاشتراك بنجاح BOK PEDRO' +
 
             '</div>' +
 
@@ -404,7 +404,7 @@ function showSuccessDialog(
 
             '<button class="ios-ok" id="iosSuccessOk">' +
 
-                'تم' +
+                'تم بنجاح' +
 
             '</button>' +
 
