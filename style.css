@@ -1,103 +1,281 @@
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
+/* ======================================================
+   iOS Dialog
+   ====================================================== */
+
+#iosSuccessDialog,
+#iosErrorDialog{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:99999;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:rgba(0,0,0,.58);
+
+    backdrop-filter:blur(20px);
+
+    -webkit-backdrop-filter:blur(20px);
+
+    opacity:0;
+
+    transition:opacity .25s ease;
 }
 
-body{
-font-family:Arial,sans-serif;
-background:#070a10;
-color:#fff;
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
-direction:rtl;
+
+#iosSuccessDialog.show,
+#iosErrorDialog.show{
+
+    opacity:1;
 }
 
-.page{
-width:100%;
-max-width:430px;
+
+.ios-dialog{
+
+    width:100%;
+
+    max-width:370px;
+
+    padding:28px 22px 20px;
+
+    border-radius:28px;
+
+    background:rgba(24,30,42,.97);
+
+    border:1px solid rgba(255,255,255,.10);
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.60),
+        inset 0 1px 0 rgba(255,255,255,.07);
+
+    text-align:center;
+
+    transform:scale(.88);
+
+    transition:
+        transform .28s
+        cubic-bezier(.2,.8,.2,1);
 }
 
-.card{
-background:#111722;
-border:1px solid #293241;
-border-radius:24px;
-padding:25px;
-box-shadow:0 20px 60px #0008;
+
+#iosSuccessDialog.show .ios-dialog,
+#iosErrorDialog.show .ios-dialog{
+
+    transform:scale(1);
 }
 
-.card h2{
-text-align:center;
-margin-bottom:20px;
+
+/* =========================
+   Success Icon
+   ========================= */
+
+.ios-success-icon{
+
+    width:76px;
+
+    height:76px;
+
+    margin:0 auto 18px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#19c37d;
+
+    box-shadow:
+        0 10px 35px rgba(25,195,125,.30);
 }
 
-input,select{
-width:100%;
-height:52px;
-margin-bottom:14px;
-border-radius:14px;
-border:1px solid #303947;
-background:#080d15;
-color:#fff;
-padding:0 15px;
-font-size:16px;
-text-align:center;
-outline:none;
+
+.ios-success-icon span{
+
+    color:#fff;
+
+    font-size:43px;
+
+    font-weight:700;
+
+    line-height:1;
 }
 
-button{
-width:100%;
-height:52px;
-border:0;
-border-radius:14px;
-background:#d71920;
-color:#fff;
-font-size:17px;
-font-weight:bold;
+
+/* =========================
+   Error Icon
+   ========================= */
+
+.ios-error-icon{
+
+    width:76px;
+
+    height:76px;
+
+    margin:0 auto 18px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#d71920;
+
+    box-shadow:
+        0 10px 35px rgba(215,25,32,.30);
 }
 
-button:disabled{
-opacity:.5;
+
+.ios-error-icon span{
+
+    color:#fff;
+
+    font-size:40px;
+
+    font-weight:700;
+
 }
 
-.message{
-text-align:center;
-min-height:22px;
-margin-top:12px;
-color:#ff7777;
+
+/* =========================
+   Title
+   ========================= */
+
+.ios-dialog-title{
+
+    color:#fff;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
 }
 
-.result{
-margin-top:20px;
-background:#090e16;
-border:1px solid #252d3a;
-border-radius:18px;
-padding:18px;
+
+/* =========================
+   Message
+   ========================= */
+
+.ios-dialog-message{
+
+    color:#9ba5b5;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+    margin-bottom:20px;
 }
 
-.item{
-display:flex;
-justify-content:space-between;
-gap:15px;
-padding:13px 0;
-border-bottom:1px solid #202733;
+
+/* =========================
+   Information
+   ========================= */
+
+.ios-info{
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.045);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    margin-bottom:18px;
 }
 
-.item span{
-color:#8994a5;
+
+.ios-row{
+
+    min-height:50px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    padding:0 15px;
+
+    border-bottom:1px solid
+        rgba(255,255,255,.06);
 }
 
-.item strong{
-color:#fff;
+
+.ios-row:last-child{
+
+    border-bottom:0;
 }
 
-select{
-margin-top:18px;
+
+.ios-row span{
+
+    color:#8994a5;
+
+    font-size:14px;
 }
 
-.hidden{
-display:none!important;
+
+.ios-row strong{
+
+    color:#fff;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+
+/* =========================
+   Button
+   ========================= */
+
+.ios-ok{
+
+    width:100%;
+
+    height:52px;
+
+    border:0;
+
+    border-radius:16px;
+
+    background:#d71920;
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+}
+
+
+.ios-ok:active{
+
+    transform:scale(.97);
+
+    opacity:.85;
 }
