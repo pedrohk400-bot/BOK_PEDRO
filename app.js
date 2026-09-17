@@ -1,86 +1,91 @@
-// ======================================================
-// BOK - Firebase
-// ======================================================
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDnvmRTgZl1p325V3TmCjIH-PnPfjJPPpk",
-    authDomain: "bok-ped.firebaseapp.com",
-    databaseURL: "https://bok-ped-default-rtdb.firebaseio.com",
-    projectId: "bok-ped",
-    storageBucket: "bok-ped.firebasestorage.app",
-    messagingSenderId: "812838230843",
-    appId: "1:812838230843:web:f3bd5f59343db42b52b51e",
-    measurementId: "G-26SMZR0QCC"
+const firebaseConfig={
+apiKey:"AIzaSyDnvmRTgZl1p325V3TmCjIH-PnPfjJPPpk",
+authDomain:"bok-ped.firebaseapp.com",
+databaseURL:"https://bok-ped-default-rtdb.firebaseio.com",
+projectId:"bok-ped",
+storageBucket:"bok-ped.firebasestorage.app",
+messagingSenderId:"812838230843",
+appId:"1:812838230843:web:f3bd5f59343db42b52b51e"
 };
-
-
-// ======================================================
-// التأكد من تحميل Firebase
-// ======================================================
-
-if (typeof firebase === "undefined") {
-    throw new Error("Firebase SDK لم يتم تحميله");
-}
-
-
-// ======================================================
-// تشغيل Firebase
-// ======================================================
 
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.database();
+const auth=firebase.auth();
+const db=firebase.database();
 
+let uid,account,data;
 
-// ======================================================
-// عناصر الصفحة
-// ======================================================
+function login(){
+auth.signInWithEmailAndPassword(
+email.value.trim(),
+password.value
+).then(()=>{
+login.style.display="none";
+app.style.display="block";
+}).catch(e=>loginMsg.textContent=e.message);
+}
 
-const loginBox =
-    document.getElementById("loginBox");
+function search(){
+let n=account.value.trim();
 
-const searchBox =
-    document.getElementById("searchBox");
+if(!/^\d{7}$/.test(n)){
+msg.textContent="أدخل 7 أرقام";
+return;
+}
 
-const emailInput =
-    document.getElementById("email");
+db.ref("accountNumbers/"+n).once("value").then(a=>{
+if(!a.exists())throw "الحساب غير موجود";
 
-const passwordInput =
-    document.getElementById("password");
+uid=a.val().uid;
+account=n;
 
-const loginButton =
-    document.getElementById("loginButton");
+return db.ref("users/"+uid).once("value");
+}).then(u=>{
+data=u.val();
 
-const message =
-    document.getElementById("message");
+rAccount.textContent=account;
+rName.textContent=data.username||"-";
+rActive.textContent=data.active?"مفعل":"غير مفعل";
+rSub.textContent=data.subscriptionName||"-";
+rStart.textContent=date(data.subscriptionStart);
+rEnd.textContent=date(data.subscriptionEnd);
 
-const userEmail =
-    document.getElementById("userEmail");
+result.style.display="block";
+msg.textContent="";
+}).catch(e=>msg.textContent=e.message||e);
+}
 
-const accountInput =
-    document.getElementById("accountNumber");
+function renew(){
+if(!uid)return;
 
-const searchButton =
-    document.getElementById("searchButton");
+let days=Number(period.value);
+let now=Date.now();
+let old=Number(data.subscriptionEnd)||0;
+let start=old>now?old:now;
+let end=start+days*86400000;
 
-const searchMessage =
-    document.getElementById("searchMessage");
+db.ref("users/"+uid).update({
+active:true,
+subscriptionStart:start,
+subscriptionEnd:end,
+subscriptionName:period.options[period.selectedIndex].text
+}).then(()=>{
+data.subscriptionStart=start;
+data.subscriptionEnd=end;
+data.subscriptionName=period.options[period.selectedIndex].text;
 
-const result =
-    document.getElementById("result");
+rActive.textContent="مفعل";
+rSub.textContent=data.subscriptionName;
+rStart.textContent=date(start);
+rEnd.textContent=date(end);
 
-const renewButton =
-    document.getElementById("renewButton");
+alert("تم تجديد الاشتراك بنجاح");
+}).catch(e=>alert(e.message));
+}
 
-const closeSuccess =
-    document.getElementById("closeSuccess");
-
-
-// ======================================================
-// متغيرات النظام
-// ======================================================
-
+function date(x){
+return x?new Date(x).toLocaleString("ar"):"-";
+}
 let currentUid = null;
 let currentAccountNumber = null;
 let currentUserData = null;
