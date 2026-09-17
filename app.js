@@ -15,6 +15,7 @@ const db = firebase.database();
 
 const loginBox = document.getElementById("login");
 const appBox = document.getElementById("app");
+
 const loginBtn = document.getElementById("loginBtn");
 const searchBtn = document.getElementById("searchBtn");
 const renewBtn = document.getElementById("renewBtn");
@@ -24,42 +25,96 @@ let account = null;
 let data = null;
 
 
-/* تسجيل الدخول */
+/* =========================================
+   عند فتح الموقع
+   تسجيل خروج الجلسة القديمة
+========================================= */
+
+auth.signOut().catch(function () {});
+
+
+/* =========================================
+   إظهار تسجيل الدخول
+========================================= */
+
+loginBox.classList.remove("hidden");
+appBox.classList.add("hidden");
+
+
+/* =========================================
+   تسجيل الدخول
+========================================= */
+
 loginBtn.onclick = function () {
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const msg = document.getElementById("loginMsg");
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const msg =
+        document.getElementById("loginMsg");
 
     if (!email || !password) {
-        msg.textContent = "أدخل البريد وكلمة المرور";
+        msg.textContent =
+            "أدخل البريد وكلمة المرور";
         return;
     }
 
     loginBtn.disabled = true;
-    loginBtn.textContent = "جاري الدخول...";
+    loginBtn.textContent =
+        "جاري الدخول...";
 
-    auth.signInWithEmailAndPassword(email, password)
-    .catch(function () {
-        msg.textContent = "بيانات الدخول غير صحيحة";
+    auth.signInWithEmailAndPassword(
+        email,
+        password
+    )
+
+    .then(function () {
+
+        loginBox.classList.add("hidden");
+        appBox.classList.remove("hidden");
+
+        msg.textContent = "";
+
     })
+
+    .catch(function (error) {
+
+        console.log("LOGIN ERROR:", error);
+
+        msg.textContent =
+            "بيانات الدخول غير صحيحة";
+
+    })
+
     .finally(function () {
+
         loginBtn.disabled = false;
         loginBtn.textContent = "دخول";
+
     });
 };
 
 
-/* حالة تسجيل الدخول */
+/* =========================================
+   مراقبة حالة تسجيل الدخول
+========================================= */
+
 auth.onAuthStateChanged(function (user) {
 
-    if (user) {
-        loginBox.classList.add("hidden");
-        appBox.classList.remove("hidden");
-        console.log("تم الدخول:", user.email);
-    } else {
+    /*
+       مهم:
+       لا نغير الشاشة هنا.
+       تسجيل الدخول هو الذي يغيرها.
+    */
+
+    if (!user) {
+
         loginBox.classList.remove("hidden");
         appBox.classList.add("hidden");
+
         uid = null;
         account = null;
         data = null;
@@ -68,206 +123,502 @@ auth.onAuthStateChanged(function (user) {
 });
 
 
-/* البحث */
+/* =========================================
+   البحث عن الحساب
+========================================= */
+
 searchBtn.onclick = function () {
 
-    const number = document.getElementById("account").value.trim();
-    const msg = document.getElementById("msg");
+    const number =
+        document.getElementById("account")
+        .value.trim();
+
+    const msg =
+        document.getElementById("msg");
 
     if (!/^[0-9]{7}$/.test(number)) {
-        msg.textContent = "أدخل رقم حساب مكون من 7 أرقام";
+
+        msg.textContent =
+            "أدخل رقم حساب مكون من 7 أرقام";
+
         return;
     }
 
     searchBtn.disabled = true;
-    searchBtn.textContent = "جاري البحث...";
+    searchBtn.textContent =
+        "جاري البحث...";
+
     msg.textContent = "";
 
-    db.ref("accountNumbers/" + number).once("value")
+    db.ref(
+        "accountNumbers/" + number
+    )
+
+    .once("value")
+
     .then(function (snap) {
 
         if (!snap.exists()) {
-            throw new Error("رقم الحساب غير موجود");
+
+            throw new Error(
+                "رقم الحساب غير موجود"
+            );
         }
 
-        const a = snap.val();
+        const accountData =
+            snap.val();
 
-        if (!a || !a.uid) {
-            throw new Error("الحساب غير مرتبط بمستخدم");
+        if (
+            !accountData ||
+            !accountData.uid
+        ) {
+
+            throw new Error(
+                "الحساب غير مرتبط بمستخدم"
+            );
         }
 
-        uid = a.uid;
-        account = number;
+        uid =
+            accountData.uid;
 
-        return db.ref("users/" + uid).once("value");
+        account =
+            number;
+
+        return db.ref(
+            "users/" + uid
+        ).once("value");
+
     })
+
     .then(function (snap) {
 
         if (!snap.exists()) {
-            throw new Error("الحساب محذوف ولا يمكن تجديده");
+
+            throw new Error(
+                "الحساب محذوف ولا يمكن تجديده"
+            );
         }
 
-        data = snap.val();
+        data =
+            snap.val();
 
-        document.getElementById("rAccount").textContent = account;
-        document.getElementById("rName").textContent = data.username || "-";
-        document.getElementById("rActive").textContent =
-            data.active ? "مفعل" : "غير مفعل";
-        document.getElementById("rSub").textContent =
+        document.getElementById(
+            "rAccount"
+        ).textContent =
+            account;
+
+        document.getElementById(
+            "rName"
+        ).textContent =
+            data.username || "-";
+
+        document.getElementById(
+            "rActive"
+        ).textContent =
+            data.active
+                ? "مفعل"
+                : "غير مفعل";
+
+        document.getElementById(
+            "rSub"
+        ).textContent =
             data.subscriptionName || "-";
-        document.getElementById("rStart").textContent =
-            formatDate(data.subscriptionStart);
-        document.getElementById("rEnd").textContent =
-            formatDate(data.subscriptionEnd);
 
-        document.getElementById("result").classList.remove("hidden");
-        msg.textContent = "تم العثور على الحساب";
+        document.getElementById(
+            "rStart"
+        ).textContent =
+            formatDate(
+                data.subscriptionStart
+            );
+
+        document.getElementById(
+            "rEnd"
+        ).textContent =
+            formatDate(
+                data.subscriptionEnd
+            );
+
+        document.getElementById(
+            "result"
+        ).classList.remove("hidden");
+
+        msg.textContent =
+            "تم العثور على الحساب";
+
     })
-    .catch(function (e) {
-        msg.textContent = e.message;
-        console.log(e);
+
+    .catch(function (error) {
+
+        console.log(
+            "SEARCH ERROR:",
+            error
+        );
+
+        msg.textContent =
+            error.message;
+
     })
+
     .finally(function () {
+
         searchBtn.disabled = false;
-        searchBtn.textContent = "بحث";
+
+        searchBtn.textContent =
+            "بحث";
+
     });
 };
 
 
-/* التجديد */
+/* =========================================
+   زر التجديد
+========================================= */
+
 renewBtn.onclick = function () {
 
     if (!uid) {
-        showErrorDialog("تنبيه", "ابحث عن الحساب أولاً");
+
+        showErrorDialog(
+            "تنبيه",
+            "ابحث عن الحساب أولاً"
+        );
+
         return;
     }
 
-    const period = document.getElementById("period");
-    const text = period.options[period.selectedIndex].textContent.trim();
+    const period =
+        document.getElementById("period");
 
-    let type, name;
+    const selected =
+        period.options[
+            period.selectedIndex
+        ];
+
+    if (!selected) {
+
+        showErrorDialog(
+            "خطأ",
+            "اختر مدة الاشتراك"
+        );
+
+        return;
+    }
+
+    const text =
+        selected.textContent.trim();
+
+    let type = "";
+    let name = "";
+
 
     if (text.includes("يوم")) {
+
         type = "day";
         name = "يوم واحد";
-    } else if (text.includes("أسبوع") || text.includes("اسبوع")) {
+
+    }
+
+    else if (
+        text.includes("أسبوع") ||
+        text.includes("اسبوع")
+    ) {
+
         type = "week";
         name = "أسبوع واحد";
-    } else if (text.includes("12") && text.includes("شهر")) {
+
+    }
+
+    else if (
+        text.includes("12") &&
+        text.includes("شهر")
+    ) {
+
         type = "12months";
         name = "12 شهر";
-    } else if (text.includes("3") && text.includes("شهر")) {
+
+    }
+
+    else if (
+        text.includes("3") &&
+        text.includes("شهر")
+    ) {
+
         type = "3months";
         name = "3 شهور";
-    } else if (text.includes("شهر")) {
+
+    }
+
+    else if (
+        text.includes("شهر")
+    ) {
+
         type = "month";
         name = "شهر واحد";
-    } else {
-        showErrorDialog("خطأ", "مدة الاشتراك غير صحيحة");
+
+    }
+
+    else {
+
+        showErrorDialog(
+            "خطأ",
+            "مدة الاشتراك غير صحيحة"
+        );
+
         return;
     }
 
+
     renewBtn.disabled = true;
-    renewBtn.textContent = "جاري التجديد...";
+    renewBtn.textContent =
+        "جاري التجديد...";
 
-    const ref = db.ref("users/" + uid);
 
-    ref.once("value")
+    const userRef =
+        db.ref("users/" + uid);
+
+
+    userRef.once("value")
+
     .then(function (snap) {
 
         if (!snap.exists()) {
-            throw new Error("الحساب محذوف ولا يمكن تجديده");
+
+            throw new Error(
+                "الحساب محذوف ولا يمكن تجديده"
+            );
         }
 
-        const user = snap.val();
-        const now = Date.now();
-        const oldEnd = Number(user.subscriptionEnd) || 0;
-        const start = oldEnd > now ? oldEnd : now;
+        const user =
+            snap.val();
 
-        const endDate = new Date(start);
+        const now =
+            Date.now();
 
-        if (type === "day")
-            endDate.setDate(endDate.getDate() + 1);
+        const oldEnd =
+            Number(
+                user.subscriptionEnd
+            ) || 0;
 
-        else if (type === "week")
-            endDate.setDate(endDate.getDate() + 7);
+        const start =
+            oldEnd > now
+                ? oldEnd
+                : now;
 
-        else if (type === "month")
-            endDate.setMonth(endDate.getMonth() + 1);
+        const endDate =
+            new Date(start);
 
-        else if (type === "3months")
-            endDate.setMonth(endDate.getMonth() + 3);
 
-        else if (type === "12months")
-            endDate.setFullYear(endDate.getFullYear() + 1);
+        if (type === "day") {
 
-        const end = endDate.getTime();
+            endDate.setDate(
+                endDate.getDate() + 1
+            );
 
-        return ref.update({
+        }
+
+        else if (type === "week") {
+
+            endDate.setDate(
+                endDate.getDate() + 7
+            );
+
+        }
+
+        else if (type === "month") {
+
+            endDate.setMonth(
+                endDate.getMonth() + 1
+            );
+
+        }
+
+        else if (type === "3months") {
+
+            endDate.setMonth(
+                endDate.getMonth() + 3
+            );
+
+        }
+
+        else if (type === "12months") {
+
+            endDate.setFullYear(
+                endDate.getFullYear() + 1
+            );
+
+        }
+
+
+        const end =
+            endDate.getTime();
+
+
+        return userRef.update({
+
             active: true,
-            subscriptionStart: start,
-            subscriptionEnd: end,
-            subscriptionType: type,
-            subscriptionName: name
+
+            subscriptionStart:
+                start,
+
+            subscriptionEnd:
+                end,
+
+            subscriptionType:
+                type,
+
+            subscriptionName:
+                name
+
         })
+
         .then(function () {
 
-            document.getElementById("rActive").textContent = "مفعل";
-            document.getElementById("rSub").textContent = name;
-            document.getElementById("rStart").textContent = formatDate(start);
-            document.getElementById("rEnd").textContent = formatDate(end);
+            document.getElementById(
+                "rActive"
+            ).textContent =
+                "مفعل";
 
-            showSuccessDialog(account, name, formatDate(end));
+            document.getElementById(
+                "rSub"
+            ).textContent =
+                name;
+
+            document.getElementById(
+                "rStart"
+            ).textContent =
+                formatDate(start);
+
+            document.getElementById(
+                "rEnd"
+            ).textContent =
+                formatDate(end);
+
+
+            showSuccessDialog(
+                account,
+                name,
+                formatDate(end)
+            );
+
         });
-    })
-    .catch(function (e) {
 
-        console.error("RENEW ERROR:", e);
+    })
+
+    .catch(function (error) {
+
+        console.error(
+            "RENEW ERROR:",
+            error
+        );
 
         if (
-            e.code === "PERMISSION_DENIED" ||
-            String(e.message).toLowerCase().includes("permission denied")
+            error.code ===
+            "PERMISSION_DENIED" ||
+            String(
+                error.message
+            )
+            .toLowerCase()
+            .includes(
+                "permission denied"
+            )
         ) {
+
             showErrorDialog(
                 "خطأ في الصلاحيات",
                 "ليس لديك صلاحية لتجديد هذا الحساب"
             );
-        } else {
-            showErrorDialog("خطأ", e.message);
+
         }
+
+        else {
+
+            showErrorDialog(
+                "خطأ",
+                error.message ||
+                "تعذر تجديد الاشتراك"
+            );
+
+        }
+
     })
+
     .finally(function () {
+
         renewBtn.disabled = false;
-        renewBtn.textContent = "تجديد الاشتراك";
+
+        renewBtn.textContent =
+            "تجديد الاشتراك";
+
     });
+
 };
 
 
-/* التاريخ */
+/* =========================================
+   تنسيق التاريخ
+========================================= */
+
 function formatDate(timestamp) {
 
-    if (!timestamp) return "-";
+    if (
+        timestamp === null ||
+        timestamp === undefined ||
+        timestamp === ""
+    ) {
+        return "-";
+    }
 
-    const d = new Date(Number(timestamp));
+    const date =
+        new Date(
+            Number(timestamp)
+        );
 
-    if (isNaN(d.getTime())) return "-";
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+        return "-";
+    }
 
-    return d.toLocaleString("ar");
+    return date.toLocaleString("ar");
 }
 
 
-/* الرسائل */
-function showSuccessDialog(account, period, end) {
+/* =========================================
+   رسالة النجاح
+========================================= */
+
+function showSuccessDialog(
+    accountNumber,
+    periodName,
+    endDate
+) {
 
     alert(
         "تم تجديد الاشتراك بنجاح\n\n" +
-        "رقم الحساب: " + account +
-        "\n\nالمدة: " + period +
-        "\n\nينتهي في: " + end
+        "رقم الحساب: " +
+        accountNumber +
+        "\n\nالمدة: " +
+        periodName +
+        "\n\nينتهي في: " +
+        endDate
     );
 }
 
-function showErrorDialog(title, message) {
 
-    alert(title + "\n\n" + message);
+/* =========================================
+   رسالة الخطأ
+========================================= */
+
+function showErrorDialog(
+    title,
+    message
+) {
+
+    alert(
+        title +
+        "\n\n" +
+        message
+    );
 }
