@@ -20,9 +20,9 @@
 
 <div class="page">
 
-    <!-- ==============================
+    <!-- =========================
          HEADER
-    =============================== -->
+    ========================== -->
 
     <div class="brand">
 
@@ -41,9 +41,9 @@
     </div>
 
 
-    <!-- ==============================
+    <!-- =========================
          LOGIN
-    =============================== -->
+    ========================== -->
 
     <div
         id="loginBox"
@@ -54,14 +54,12 @@
             تسجيل الدخول
         </h2>
 
-
         <input
             id="email"
             type="email"
             placeholder="البريد الإلكتروني"
             autocomplete="email"
         >
-
 
         <input
             id="password"
@@ -70,11 +68,9 @@
             autocomplete="current-password"
         >
 
-
         <button id="loginButton">
             تسجيل الدخول
         </button>
-
 
         <div
             id="message"
@@ -84,9 +80,9 @@
     </div>
 
 
-    <!-- ==============================
+    <!-- =========================
          SEARCH
-    =============================== -->
+    ========================== -->
 
     <div
         id="searchBox"
@@ -135,9 +131,9 @@
         ></div>
 
 
-        <!-- ==============================
+        <!-- =========================
              RESULT
-        =============================== -->
+        ========================== -->
 
         <div
             id="result"
@@ -156,19 +152,6 @@
                 </span>
 
                 <strong id="resultAccount">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="item">
-
-                <span>
-                    UID
-                </span>
-
-                <strong id="resultUid">
                     -
                 </strong>
 
@@ -217,19 +200,6 @@
             <div class="item">
 
                 <span>
-                    نوع الاشتراك
-                </span>
-
-                <strong id="resultSubscriptionType">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="item">
-
-                <span>
                     بداية الاشتراك
                 </span>
 
@@ -253,32 +223,136 @@
             </div>
 
 
-            <div class="item">
+            <!-- =========================
+                 RENEWAL
+            ========================== -->
 
-                <span>
-                    Device ID
-                </span>
+            <div class="renewDivider"></div>
 
-                <strong id="resultDeviceId">
-                    -
-                </strong>
+
+            <div class="renewTitle">
+                تجديد الاشتراك
+            </div>
+
+
+            <div class="renewOptions">
+
+                <button
+                    class="renewOption"
+                    data-days="1"
+                    data-name="يوم واحد"
+                >
+                    يوم
+                </button>
+
+
+                <button
+                    class="renewOption"
+                    data-days="7"
+                    data-name="أسبوع واحد"
+                >
+                    أسبوع
+                </button>
+
+
+                <button
+                    class="renewOption"
+                    data-months="1"
+                    data-name="شهر واحد"
+                >
+                    شهر
+                </button>
+
+
+                <button
+                    class="renewOption"
+                    data-months="3"
+                    data-name="3 شهور"
+                >
+                    3 شهور
+                </button>
+
+
+                <button
+                    class="renewOption"
+                    data-months="12"
+                    data-name="12 شهر"
+                >
+                    12 شهر
+                </button>
 
             </div>
 
 
-            <div class="item">
+            <button
+                id="renewButton"
+                class="renewButton"
+                disabled
+            >
+                تجديد الاشتراك
+            </button>
 
-                <span>
-                    تاريخ الإنشاء
-                </span>
 
-                <strong id="resultCreatedAt">
-                    -
-                </strong>
-
-            </div>
+            <div
+                id="renewMessage"
+                class="message"
+            ></div>
 
         </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SUCCESS MODAL
+========================== -->
+
+<div
+    id="successOverlay"
+    class="successOverlay hidden"
+>
+
+    <div class="successModal">
+
+        <div class="successIcon">
+            ✓
+        </div>
+
+
+        <div class="successTitle">
+            تم تجديد الاشتراك بنجاح
+        </div>
+
+
+        <div class="successLine"></div>
+
+
+        <div class="successAccountLabel">
+            حساب رقم
+        </div>
+
+
+        <div
+            id="successAccount"
+            class="successAccount"
+        >
+            -
+        </div>
+
+
+        <div class="successText">
+            تم تحديث مدة الاشتراك بنجاح
+        </div>
+
+
+        <button
+            id="closeSuccess"
+            class="successButton"
+        >
+            تم
+        </button>
 
     </div>
 
