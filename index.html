@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOK | فحص الحساب</title>
+    <link rel="stylesheet" href="style.css">
+</head><body><div class="page"><div class="brand">
+    <div class="logo">BOK</div>
+    <h1>فحص الحساب</h1>
+    <p>الوصول إلى بيانات حسابك</p>
+</div>
+
+<!-- تسجيل الدخول -->
+<div id="loginBox" class="card">
+
+    <h2>تسجيل الدخول</h2>
+
+    <input
+        id="email"
+        type="email"
+        placeholder="البريد الإلكتروني"
+        autocomplete="email"
+    >
+
+    <input
+        id="password"
+        type="password"
+        placeholder="كلمة المرور"
+        autocomplete="current-password"
+    >
+
+    <button id="loginBtn">
+        تسجيل الدخول
+    </button>
+
+    <div id="loginError" class="message error"></div>
+
+</div>
+
+
+<!-- البحث -->
+<div id="mainBox" class="card hidden">
+
+    <div class="accountHeader">
+        <div>
+            <small>الحساب المسجل</small>
+            <div id="userEmail"></div>
+        </div>
+
+        <button id="logoutBtn" class="logout">
+            خروج
+        </button>
+    </div>
+
+    <h2>البحث</h2>
+
+    <input
+        id="accountInput"
+        type="text"
+        inputmode="numeric"
+        maxlength="7"
+        placeholder="أدخل رقم الحساب المكوّن من 7 أرقام"
+    >
+
+    <button id="searchBtn">
+        بحث
+    </button>
+
+    <div id="searchMessage" class="message"></div>
+
+
+    <!-- النتيجة -->
+    <div id="resultBox" class="result hidden">
+
+        <div class="resultTitle">
+            بيانات الحساب
+        </div>
+
+        <div class="item">
+            <span>رقم الحساب</span>
+            <strong id="accountResult">-</strong>
+        </div>
+
+        <div class="item">
+            <span>الاسم</span>
+            <strong id="nameResult">-</strong>
+        </div>
+
+        <div class="item">
+            <span>الحالة</span>
+            <strong id="activeResult">-</strong>
+        </div>
+
+        <div class="item">
+            <span>الاشتراك</span>
+            <strong id="subscriptionResult">-</strong>
+        </div>
+
+    </div>
+
+</div>
+
+</div><script type="module" src="app.js"></script></body>
+</html>
