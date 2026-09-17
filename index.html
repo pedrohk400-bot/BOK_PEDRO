@@ -68,7 +68,10 @@
             autocomplete="current-password"
         >
 
-        <button id="loginButton">
+        <button
+            id="loginButton"
+            type="button"
+        >
             تسجيل الدخول
         </button>
 
@@ -107,6 +110,289 @@
 
 
         <h2>
+            البحث عن حساب
+        </h2>
+
+
+        <input
+            id="accountNumber"
+            type="text"
+            inputmode="numeric"
+            maxlength="7"
+            placeholder="أدخل رقم الحساب المكوّن من 7 أرقام"
+        >
+
+
+        <button
+            id="searchButton"
+            type="button"
+        >
+            بحث
+        </button>
+
+
+        <div
+            id="searchMessage"
+            class="message"
+        ></div>
+
+
+        <!-- =========================
+             RESULT
+        ========================== -->
+
+        <div
+            id="result"
+            class="result hidden"
+        >
+
+            <div class="resultTitle">
+                بيانات الحساب
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    رقم الحساب
+                </span>
+
+                <strong id="resultAccount">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    الاسم
+                </span>
+
+                <strong id="resultName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    الحالة
+                </span>
+
+                <strong id="resultStatus">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    الاشتراك
+                </span>
+
+                <strong id="resultSubscription">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    بداية الاشتراك
+                </span>
+
+                <strong id="resultSubscriptionStart">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    نهاية الاشتراك
+                </span>
+
+                <strong id="resultSubscriptionEnd">
+                    -
+                </strong>
+
+            </div>
+
+
+            <!-- =========================
+                 RENEWAL
+            ========================== -->
+
+            <div class="renewDivider"></div>
+
+
+            <div class="renewTitle">
+                تجديد الاشتراك
+            </div>
+
+
+            <div class="renewOptions">
+
+                <button
+                    type="button"
+                    class="renewOption"
+                    data-days="1"
+                    data-name="يوم واحد"
+                >
+                    يوم
+                </button>
+
+
+                <button
+                    type="button"
+                    class="renewOption"
+                    data-days="7"
+                    data-name="أسبوع واحد"
+                >
+                    أسبوع
+                </button>
+
+
+                <button
+                    type="button"
+                    class="renewOption"
+                    data-months="1"
+                    data-name="شهر واحد"
+                >
+                    شهر
+                </button>
+
+
+                <button
+                    type="button"
+                    class="renewOption"
+                    data-months="3"
+                    data-name="3 شهور"
+                >
+                    3 شهور
+                </button>
+
+
+                <button
+                    type="button"
+                    class="renewOption"
+                    data-months="12"
+                    data-name="12 شهر"
+                >
+                    12 شهر
+                </button>
+
+            </div>
+
+
+            <button
+                id="renewButton"
+                class="renewButton"
+                type="button"
+                disabled
+            >
+                تجديد الاشتراك
+            </button>
+
+
+            <div
+                id="renewMessage"
+                class="message"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SUCCESS MODAL
+========================== -->
+
+<div
+    id="successOverlay"
+    class="successOverlay hidden"
+>
+
+    <div class="successModal">
+
+        <div class="successIcon">
+            ✓
+        </div>
+
+
+        <div class="successTitle">
+            تم تجديد الاشتراك بنجاح
+        </div>
+
+
+        <div class="successLine"></div>
+
+
+        <div class="successAccountLabel">
+            حساب رقم
+        </div>
+
+
+        <div
+            id="successAccount"
+            class="successAccount"
+        >
+            -
+        </div>
+
+
+        <div class="successText">
+            تم تحديث مدة الاشتراك بنجاح
+        </div>
+
+
+        <button
+            id="closeSuccess"
+            class="successButton"
+            type="button"
+        >
+            تم
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FIREBASE
+========================== -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+
+<!-- =========================
+     APP
+========================== -->
+
+<script src="app.js"></script>
+
+
+</body>
+
+    </html>        <h2>
             البحث عن حساب
         </h2>
 
