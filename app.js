@@ -1,7 +1,3 @@
-// ======================================================
-// Firebase Config
-// ======================================================
-
 const firebaseConfig = {
     apiKey: "AIzaSyDnvmRTgZl1p325V3TmCjIH-PnPfjJPPpk",
     authDomain: "bok-ped.firebaseapp.com",
@@ -14,29 +10,53 @@ const firebaseConfig = {
 };
 
 
-// ======================================================
-// تشغيل Firebase
-// ======================================================
+// ==================================================
+// CHECK FIREBASE
+// ==================================================
+
+if (typeof firebase === "undefined") {
+
+    alert("Firebase لم يتم تحميله");
+
+    throw new Error("Firebase SDK not loaded");
+}
+
+
+// ==================================================
+// INIT
+// ==================================================
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+
 const db = firebase.database();
 
 
-// ======================================================
-// عناصر الصفحة
-// ======================================================
+// ==================================================
+// ELEMENTS
+// ==================================================
 
-const loginBox = document.getElementById("loginBox");
-const searchBox = document.getElementById("searchBox");
+const loginBox =
+    document.getElementById("loginBox");
 
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginButton = document.getElementById("loginButton");
-const message = document.getElementById("message");
+const searchBox =
+    document.getElementById("searchBox");
 
-const userEmail = document.getElementById("userEmail");
+const emailInput =
+    document.getElementById("email");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const message =
+    document.getElementById("message");
+
+const userEmail =
+    document.getElementById("userEmail");
 
 const accountInput =
     document.getElementById("accountNumber");
@@ -57,23 +77,27 @@ const closeSuccess =
     document.getElementById("closeSuccess");
 
 
-// ======================================================
-// بيانات الحساب
-// ======================================================
+// ==================================================
+// VARIABLES
+// ==================================================
 
 let currentUid = null;
+
 let currentAccountNumber = null;
+
 let currentUserData = null;
+
 let selectedRenewal = null;
 
 
-// ======================================================
-// رسالة الدخول
-// ======================================================
+// ==================================================
+// LOGIN MESSAGE
+// ==================================================
 
-function showLoginMessage(text, type) {
+function loginMessage(text, type) {
 
     message.textContent = text;
+
     message.className = "message";
 
     if (type) {
@@ -82,9 +106,9 @@ function showLoginMessage(text, type) {
 }
 
 
-// ======================================================
-// تسجيل الدخول
-// ======================================================
+// ==================================================
+// LOGIN
+// ==================================================
 
 async function login() {
 
@@ -97,7 +121,7 @@ async function login() {
 
     if (!email) {
 
-        showLoginMessage(
+        loginMessage(
             "أدخل البريد الإلكتروني",
             "error"
         );
@@ -107,6 +131,831 @@ async function login() {
         return;
     }
 
+
+    if (!password) {
+
+        loginMessage(
+            "أدخل كلمة المرور",
+            "error"
+        );
+
+        passwordInput.focus();
+
+        return;
+    }
+
+
+    loginButton.disabled = true;
+
+    loginButton.textContent =
+        "جاري تسجيل الدخول...";
+
+
+    loginMessage(
+        "جاري التحقق...",
+        ""
+    );
+
+
+    try {
+
+        const resultLogin =
+            await auth.signInWithEmailAndPassword(
+                email,
+                password
+            );
+
+
+        currentUid =
+            resultLogin.user.uid;
+
+
+        loginMessage(
+            "تم تسجيل الدخول بنجاح",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
+
+
+        let text =
+            "تعذر تسجيل الدخول";
+
+
+        if (
+            error.code ===
+            "auth/invalid-email"
+        ) {
+
+            text =
+                "البريد الإلكتروني غير صحيح";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/user-not-found"
+        ) {
+
+            text =
+                "الحساب غير موجود";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/wrong-password"
+        ) {
+
+            text =
+                "كلمة المرور غير صحيحة";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/invalid-credential"
+        ) {
+
+            text =
+                "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/operation-not-allowed"
+        ) {
+
+            text =
+                "تسجيل الدخول بالبريد وكلمة المرور غير مفعّل في Firebase";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/network-request-failed"
+        ) {
+
+            text =
+                "تحقق من اتصال الإنترنت";
+
+        }
+
+        else if (
+            error.code ===
+            "auth/too-many-requests"
+        ) {
+
+            text =
+                "تمت محاولات كثيرة، حاول لاحقًا";
+
+        }
+
+        else {
+
+            text =
+                error.message ||
+                "تعذر تسجيل الدخول";
+
+        }
+
+
+        loginMessage(
+            text,
+            "error"
+        );
+
+
+    } finally {
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+            "تسجيل الدخول";
+    }
+}
+
+
+// ==================================================
+// LOGIN BUTTON
+// ==================================================
+
+loginButton.addEventListener(
+    "click",
+    function (event) {
+
+        event.preventDefault();
+
+        login();
+
+    }
+);
+
+
+// ==================================================
+// ENTER LOGIN
+// ==================================================
+
+passwordInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            login();
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// AUTH STATE
+// ==================================================
+
+auth.onAuthStateChanged(
+    function (user) {
+
+        if (user) {
+
+            currentUid =
+                user.uid;
+
+
+            userEmail.textContent =
+                user.email || "-";
+
+
+            loginBox.classList.add(
+                "hidden"
+            );
+
+
+            searchBox.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        else {
+
+            currentUid = null;
+
+            currentAccountNumber = null;
+
+            currentUserData = null;
+
+
+            loginBox.classList.remove(
+                "hidden"
+            );
+
+
+            searchBox.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// SEARCH ACCOUNT
+// ==================================================
+
+async function searchAccount() {
+
+    const accountNumber =
+        accountInput.value.trim();
+
+
+    searchMessage.textContent =
+        "";
+
+
+    if (!/^[0-9]{7}$/.test(accountNumber)) {
+
+        searchMessage.textContent =
+            "أدخل رقم حساب مكون من 7 أرقام";
+
+        return;
+    }
+
+
+    searchButton.disabled = true;
+
+    searchButton.textContent =
+        "جاري البحث...";
+
+
+    try {
+
+        const accountSnapshot =
+            await db
+                .ref(
+                    "accountNumbers/" +
+                    accountNumber
+                )
+                .once("value");
+
+
+        if (!accountSnapshot.exists()) {
+
+            searchMessage.textContent =
+                "رقم الحساب غير موجود";
+
+            return;
+        }
+
+
+        const accountData =
+            accountSnapshot.val();
+
+
+        const uid =
+            accountData.uid;
+
+
+        if (!uid) {
+
+            searchMessage.textContent =
+                "لا يوجد مستخدم مرتبط بهذا الحساب";
+
+            return;
+        }
+
+
+        const userSnapshot =
+            await db
+                .ref(
+                    "users/" +
+                    uid
+                )
+                .once("value");
+
+
+        if (!userSnapshot.exists()) {
+
+            searchMessage.textContent =
+                "بيانات الحساب غير موجودة";
+
+            return;
+        }
+
+
+        const data =
+            userSnapshot.val();
+
+
+        currentAccountNumber =
+            accountNumber;
+
+        currentUid =
+            uid;
+
+        currentUserData =
+            data;
+
+
+        setText(
+            "resultAccount",
+            accountNumber
+        );
+
+
+        setText(
+            "resultName",
+            data.username || "—"
+        );
+
+
+        setText(
+            "resultStatus",
+            data.active === true
+                ? "مفعل"
+                : "غير مفعل"
+        );
+
+
+        setText(
+            "resultSubscription",
+            data.subscriptionName || "—"
+        );
+
+
+        setText(
+            "resultSubscriptionStart",
+            formatDate(
+                data.subscriptionStart
+            )
+        );
+
+
+        setText(
+            "resultSubscriptionEnd",
+            formatDate(
+                data.subscriptionEnd
+            )
+        );
+
+
+        result.classList.remove(
+            "hidden"
+        );
+
+
+        searchMessage.textContent =
+            "تم العثور على الحساب";
+
+
+        selectedRenewal = null;
+
+
+        document
+            .querySelectorAll(".renewOption")
+            .forEach(
+                function (item) {
+
+                    item.classList.remove(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+        renewButton.disabled = true;
+
+
+    } catch (error) {
+
+        console.error(
+            "SEARCH ERROR:",
+            error
+        );
+
+
+        searchMessage.textContent =
+            "تعذر قراءة بيانات الحساب: " +
+            (
+                error.message ||
+                "خطأ غير معروف"
+            );
+
+
+    } finally {
+
+        searchButton.disabled = false;
+
+        searchButton.textContent =
+            "بحث";
+    }
+}
+
+
+// ==================================================
+// SEARCH BUTTON
+// ==================================================
+
+searchButton.addEventListener(
+    "click",
+    function (event) {
+
+        event.preventDefault();
+
+        searchAccount();
+
+    }
+);
+
+
+// ==================================================
+// ENTER SEARCH
+// ==================================================
+
+accountInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            searchAccount();
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// RENEW OPTIONS
+// ==================================================
+
+document
+    .querySelectorAll(".renewOption")
+    .forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    if (!currentUid) {
+                        return;
+                    }
+
+
+                    document
+                        .querySelectorAll(".renewOption")
+                        .forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    "selected"
+                                );
+
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+
+                    selectedRenewal = {
+
+                        name:
+                            button.dataset.name,
+
+                        days:
+                            button.dataset.days
+                                ? Number(
+                                    button.dataset.days
+                                )
+                                : null,
+
+                        months:
+                            button.dataset.months
+                                ? Number(
+                                    button.dataset.months
+                                )
+                                : null
+
+                    };
+
+
+                    renewButton.disabled =
+                        false;
+
+                }
+            );
+
+        }
+    );
+
+
+// ==================================================
+// RENEW
+// ==================================================
+
+renewButton.addEventListener(
+    "click",
+    async function () {
+
+        if (!currentUid) {
+
+            alert(
+                "ابحث عن الحساب أولاً"
+            );
+
+            return;
+        }
+
+
+        if (!selectedRenewal) {
+
+            alert(
+                "اختر مدة الاشتراك أولاً"
+            );
+
+            return;
+        }
+
+
+        renewButton.disabled = true;
+
+        renewButton.textContent =
+            "جاري التجديد...";
+
+
+        try {
+
+            const now =
+                Date.now();
+
+
+            const oldEnd =
+                Number(
+                    currentUserData.subscriptionEnd
+                ) || 0;
+
+
+            const startTime =
+                oldEnd > now
+                    ? oldEnd
+                    : now;
+
+
+            let endTime =
+                startTime;
+
+
+            if (selectedRenewal.days) {
+
+                endTime +=
+                    selectedRenewal.days *
+                    24 *
+                    60 *
+                    60 *
+                    1000;
+
+            }
+
+
+            if (selectedRenewal.months) {
+
+                const date =
+                    new Date(startTime);
+
+
+                date.setMonth(
+                    date.getMonth() +
+                    selectedRenewal.months
+                );
+
+
+                endTime =
+                    date.getTime();
+
+            }
+
+
+            await db
+                .ref(
+                    "users/" +
+                    currentUid
+                )
+                .update({
+
+                    active: true,
+
+                    subscriptionStart:
+                        startTime,
+
+                    subscriptionEnd:
+                        endTime,
+
+                    subscriptionName:
+                        selectedRenewal.name
+
+                });
+
+
+            currentUserData.active =
+                true;
+
+            currentUserData.subscriptionStart =
+                startTime;
+
+            currentUserData.subscriptionEnd =
+                endTime;
+
+            currentUserData.subscriptionName =
+                selectedRenewal.name;
+
+
+            setText(
+                "resultStatus",
+                "مفعل"
+            );
+
+
+            setText(
+                "resultSubscription",
+                selectedRenewal.name
+            );
+
+
+            setText(
+                "resultSubscriptionStart",
+                formatDate(startTime)
+            );
+
+
+            setText(
+                "resultSubscriptionEnd",
+                formatDate(endTime)
+            );
+
+
+            showSuccessModal(
+                currentAccountNumber
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "RENEW ERROR:",
+                error
+            );
+
+
+            alert(
+                "تعذر تجديد الاشتراك:\n" +
+                (
+                    error.message ||
+                    "خطأ غير معروف"
+                )
+            );
+
+
+        } finally {
+
+            renewButton.disabled =
+                false;
+
+            renewButton.textContent =
+                "تجديد الاشتراك";
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// SUCCESS MODAL
+// ==================================================
+
+function showSuccessModal(
+    accountNumber
+) {
+
+    const overlay =
+        document.getElementById(
+            "successOverlay"
+        );
+
+
+    setText(
+        "successAccount",
+        accountNumber
+    );
+
+
+    overlay.classList.remove(
+        "hidden"
+    );
+}
+
+
+// ==================================================
+// CLOSE SUCCESS
+// ==================================================
+
+closeSuccess.addEventListener(
+    "click",
+    function () {
+
+        const overlay =
+            document.getElementById(
+                "successOverlay"
+            );
+
+
+        overlay.classList.add(
+            "hidden"
+        );
+
+    }
+);
+
+
+// ==================================================
+// TEXT
+// ==================================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.textContent =
+            value == null
+                ? "—"
+                : String(value);
+
+    }
+}
+
+
+// ==================================================
+// DATE
+// ==================================================
+
+function formatDate(
+    timestamp
+) {
+
+    if (!timestamp) {
+        return "—";
+    }
+
+
+    const date =
+        new Date(
+            Number(timestamp)
+        );
+
+
+    if (isNaN(date.getTime())) {
+        return "—";
+    }
+
+
+    return date.toLocaleString(
+        "ar",
+        {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+                }
 
     if (!password) {
 
