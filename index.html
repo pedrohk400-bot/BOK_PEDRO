@@ -2,28 +2,58 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>BOK | فحص الحساب</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <div class="page">
 
+    <!-- ==============================
+         HEADER
+    =============================== -->
+
     <div class="brand">
-        <div class="logo">BOK</div>
-        <h1>فحص الحساب</h1>
-        <p>الوصول إلى بيانات حسابك</p>
+
+        <div class="logo">
+            BOK
+        </div>
+
+        <h1>
+            فحص الحساب
+        </h1>
+
+        <p>
+            الوصول إلى بيانات الحساب
+        </p>
+
     </div>
 
-    <!-- تسجيل الدخول -->
-    <div id="loginBox" class="card">
 
-        <h2>تسجيل الدخول</h2>
+    <!-- ==============================
+         LOGIN
+    =============================== -->
+
+    <div
+        id="loginBox"
+        class="card"
+    >
+
+        <h2>
+            تسجيل الدخول
+        </h2>
+
 
         <input
             id="email"
@@ -32,6 +62,7 @@
             autocomplete="email"
         >
 
+
         <input
             id="password"
             type="password"
@@ -39,108 +70,56 @@
             autocomplete="current-password"
         >
 
+
         <button id="loginButton">
             تسجيل الدخول
         </button>
 
-        <div id="message" class="message"></div>
+
+        <div
+            id="message"
+            class="message"
+        ></div>
 
     </div>
 
-    <!-- البحث -->
-    <div id="searchBox" class="card hidden">
+
+    <!-- ==============================
+         SEARCH
+    =============================== -->
+
+    <div
+        id="searchBox"
+        class="card hidden"
+    >
 
         <div class="accountHeader">
+
             <div>
-                <small>الحساب المسجل</small>
-                <div id="userEmail">-</div>
+
+                <small>
+                    الحساب المسجل
+                </small>
+
+                <div id="userEmail">
+                    -
+                </div>
+
             </div>
+
         </div>
 
-        <h2>البحث عن حساب</h2>
+
+        <h2>
+            البحث عن حساب
+        </h2>
+
 
         <input
             id="accountNumber"
             type="text"
             inputmode="numeric"
             maxlength="7"
-            placeholder="أدخل رقم الحساب المكوّن من 7 أرقام"
-        >
-
-        <button id="searchButton">
-            بحث
-        </button>
-
-        <div id="searchMessage" class="message"></div>
-
-        <!-- النتيجة -->
-        <div id="result" class="result hidden">
-
-            <div class="resultTitle">
-                بيانات الحساب
-            </div>
-
-            <div class="item">
-                <span>رقم الحساب</span>
-                <strong id="resultAccount">-</strong>
-            </div>
-
-            <div class="item">
-                <span>UID</span>
-                <strong id="resultUid">-</strong>
-            </div>
-
-            <div class="item">
-                <span>الاسم</span>
-                <strong id="resultName">-</strong>
-            </div>
-
-            <div class="item">
-                <span>الحالة</span>
-                <strong id="resultStatus">-</strong>
-            </div>
-
-            <div class="item">
-                <span>الاشتراك</span>
-                <strong id="resultSubscription">-</strong>
-            </div>
-
-            <div class="item">
-                <span>نوع الاشتراك</span>
-                <strong id="resultSubscriptionType">-</strong>
-            </div>
-
-            <div class="item">
-                <span>بداية الاشتراك</span>
-                <strong id="resultSubscriptionStart">-</strong>
-            </div>
-
-            <div class="item">
-                <span>نهاية الاشتراك</span>
-                <strong id="resultSubscriptionEnd">-</strong>
-            </div>
-
-            <div class="item">
-                <span>Device ID</span>
-                <strong id="resultDeviceId">-</strong>
-            </div>
-
-            <div class="item">
-                <span>تاريخ الإنشاء</span>
-                <strong id="resultCreatedAt">-</strong>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<script type="module" src="app.js"></script>
-
-</body>
-
-</html>            maxlength="7"
             placeholder="أدخل رقم الحساب المكوّن من 7 أرقام"
         >
 
@@ -156,9 +135,9 @@
         ></div>
 
 
-        <!-- ========================= -->
-        <!-- النتيجة -->
-        <!-- ========================= -->
+        <!-- ==============================
+             RESULT
+        =============================== -->
 
         <div
             id="result"
@@ -177,6 +156,19 @@
                 </span>
 
                 <strong id="resultAccount">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    UID
+                </span>
+
+                <strong id="resultUid">
                     -
                 </strong>
 
@@ -221,6 +213,71 @@
 
             </div>
 
+
+            <div class="item">
+
+                <span>
+                    نوع الاشتراك
+                </span>
+
+                <strong id="resultSubscriptionType">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    بداية الاشتراك
+                </span>
+
+                <strong id="resultSubscriptionStart">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    نهاية الاشتراك
+                </span>
+
+                <strong id="resultSubscriptionEnd">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    Device ID
+                </span>
+
+                <strong id="resultDeviceId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="item">
+
+                <span>
+                    تاريخ الإنشاء
+                </span>
+
+                <strong id="resultCreatedAt">
+                    -
+                </strong>
+
+            </div>
+
         </div>
 
     </div>
@@ -228,14 +285,11 @@
 </div>
 
 
-<!-- ========================= -->
-<!-- Firebase / JavaScript -->
-<!-- ========================= -->
-
 <script
     type="module"
-    src="app.js">
-</script>
+    src="app.js"
+></script>
 
 </body>
+
 </html>
