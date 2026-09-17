@@ -358,7 +358,7 @@ function showSuccessDialog(
 
             '<div class="ios-dialog-message">' +
 
-                ' تم تمديد الاشتراك بنجاح BOK PEDRO' +
+                'BOK PEDRO' +
 
             '</div>' +
 
@@ -404,7 +404,7 @@ function showSuccessDialog(
 
             '<button class="ios-ok" id="iosSuccessOk">' +
 
-                'تم بنجاح' +
+                'تم' +
 
             '</button>' +
 
@@ -540,4 +540,4 @@ function escapeHtml(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 
-              }
+}
