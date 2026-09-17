@@ -14,9 +14,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-// ========================================
-// Firebase
-// ========================================
+/* =========================================
+   Firebase
+========================================= */
 
 const firebaseConfig = {
     apiKey: "AIzaSyDnvmRTgZl1p325V3TmCjIH-PnPfjJPPpk",
@@ -29,14 +29,17 @@ const firebaseConfig = {
     measurementId: "G-26SMZR0QCC"
 };
 
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getDatabase(app);
 
 
-// ========================================
-// Elements
-// ========================================
+/* =========================================
+   عناصر الصفحة
+========================================= */
 
 const loginBox = document.getElementById("loginBox");
 const searchBox = document.getElementById("searchBox");
@@ -57,9 +60,9 @@ const result = document.getElementById("result");
 const userEmail = document.getElementById("userEmail");
 
 
-// ========================================
-// Login
-// ========================================
+/* =========================================
+   تسجيل الدخول
+========================================= */
 
 loginButton.addEventListener("click", async function () {
 
@@ -79,18 +82,19 @@ loginButton.addEventListener("click", async function () {
 
     try {
 
-        const resultLogin =
+        const loginResult =
             await signInWithEmailAndPassword(
                 auth,
                 email,
                 password
             );
 
-        message.textContent = "";
+        if (loginResult.user) {
 
-        if (resultLogin.user) {
             userEmail.textContent =
-                resultLogin.user.email;
+                loginResult.user.email || "-";
+
+            message.textContent = "";
         }
 
     } catch (error) {
@@ -104,9 +108,304 @@ loginButton.addEventListener("click", async function () {
 });
 
 
-// ========================================
-// Authentication State
-// ========================================
+/* =========================================
+   حالة تسجيل الدخول
+========================================= */
+
+onAuthStateChanged(auth, function (user) {
+
+    if (user) {
+
+        loginBox.classList.add("hidden");
+
+        searchBox.classList.remove("hidden");
+
+        userEmail.textContent =
+            user.email || "-";
+
+    } else {
+
+        loginBox.classList.remove("hidden");
+
+        searchBox.classList.add("hidden");
+
+        result.classList.add("hidden");
+
+    }
+
+});
+
+
+/* =========================================
+   البحث
+========================================= */
+
+searchButton.addEventListener("click", async function () {
+
+    const user = auth.currentUser;
+
+    if (!user) {
+
+        searchMessage.textContent =
+            "يجب تسجيل الدخول أولاً";
+
+        return;
+    }
+
+
+    const accountNumber =
+        accountInput.value.trim();
+
+
+    /* التحقق من الرقم */
+
+    if (!/^\d{7}$/.test(accountNumber)) {
+
+        searchMessage.textContent =
+            "أدخل رقم حساب صحيح مكوّن من 7 أرقام";
+
+        result.classList.add("hidden");
+
+        return;
+    }
+
+
+    searchMessage.textContent =
+        "جاري البحث...";
+
+    result.classList.add("hidden");
+
+
+    try {
+
+        /* =====================================
+           أولاً:
+           accountNumbers / رقم الحساب
+        ===================================== */
+
+        const accountRef =
+            ref(
+                db,
+                "accountNumbers/" + accountNumber
+            );
+
+
+        const accountSnapshot =
+            await get(accountRef);
+
+
+        if (!accountSnapshot.exists()) {
+
+            searchMessage.textContent =
+                "رقم الحساب غير موجود في Firebase";
+
+            return;
+        }
+
+
+        const accountData =
+            accountSnapshot.val();
+
+
+        /* =====================================
+           الحصول على UID
+        ===================================== */
+
+        const uid =
+            accountData.uid || "";
+
+
+        if (uid === "") {
+
+            searchMessage.textContent =
+                "رقم الحساب موجود ولكن لا يوجد UID مرتبط به";
+
+            return;
+        }
+
+
+        /* عرض رقم الحساب */
+
+        document.getElementById(
+            "resultAccount"
+        ).textContent = accountNumber;
+
+
+        /* عرض UID */
+
+        document.getElementById(
+            "resultUid"
+        ).textContent = uid;
+
+
+        /* =====================================
+           ثانياً:
+           users / UID
+        ===================================== */
+
+        const userRef =
+            ref(
+                db,
+                "users/" + uid
+            );
+
+
+        const userSnapshot =
+            await get(userRef);
+
+
+        if (!userSnapshot.exists()) {
+
+            searchMessage.textContent =
+                "تم العثور على UID ولكن بيانات users غير موجودة";
+
+            result.classList.remove("hidden");
+
+            return;
+        }
+
+
+        const data =
+            userSnapshot.val();
+
+
+        /* =====================================
+           بيانات المستخدم
+        ===================================== */
+
+        document.getElementById(
+            "resultName"
+        ).textContent =
+            data.username || "-";
+
+
+        document.getElementById(
+            "resultStatus"
+        ).textContent =
+            data.active === true
+                ? "نشط"
+                : "غير نشط";
+
+
+        document.getElementById(
+            "resultSubscription"
+        ).textContent =
+            data.subscriptionName || "-";
+
+
+        document.getElementById(
+            "resultSubscriptionType"
+        ).textContent =
+            data.subscriptionType || "-";
+
+
+        document.getElementById(
+            "resultSubscriptionStart"
+        ).textContent =
+            formatDate(data.subscriptionStart);
+
+
+        document.getElementById(
+            "resultSubscriptionEnd"
+        ).textContent =
+            formatDate(data.subscriptionEnd);
+
+
+        document.getElementById(
+            "resultDeviceId"
+        ).textContent =
+            data.deviceId || "-";
+
+
+        document.getElementById(
+            "resultCreatedAt"
+        ).textContent =
+            formatDate(data.createdAt);
+
+
+        /* إظهار النتيجة */
+
+        result.classList.remove("hidden");
+
+        searchMessage.textContent = "";
+
+
+    } catch (error) {
+
+        console.log(error);
+
+        searchMessage.textContent =
+            "حدث خطأ أثناء الاتصال بقاعدة البيانات";
+    }
+
+});
+
+
+/* =========================================
+   تحويل التاريخ
+========================================= */
+
+function formatDate(timestamp) {
+
+    if (
+        timestamp === undefined ||
+        timestamp === null ||
+        timestamp === ""
+    ) {
+        return "-";
+    }
+
+
+    const number =
+        Number(timestamp);
+
+
+    if (isNaN(number)) {
+
+        return String(timestamp);
+    }
+
+
+    const date =
+        new Date(number);
+
+
+    if (isNaN(date.getTime())) {
+
+        return String(timestamp);
+    }
+
+
+    return date.toLocaleString(
+        "ar",
+        {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        }
+    );
+
+}
+
+
+/* =========================================
+   زر Enter
+========================================= */
+
+accountInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            searchButton.click();
+        }
+
+    }
+);// ========================================
 
 onAuthStateChanged(auth, function (user) {
 
