@@ -4,92 +4,129 @@
     padding: 0;
 }
 
+
 html,
 body {
     width: 100%;
     min-height: 100%;
 }
 
+
 body {
+
     font-family: Arial, sans-serif;
-    background: #080b12;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #171d2b 0%,
+            #080b12 45%,
+            #05070c 100%
+        );
+
     color: #ffffff;
+
     direction: rtl;
 
     min-height: 100vh;
 
     display: flex;
+
     justify-content: center;
+
     align-items: center;
 
     padding: 20px;
 }
 
 
-/* ============================= */
-/* الصفحة */
-/* ============================= */
-
 .page {
+
     width: 100%;
+
     max-width: 430px;
 }
 
 
-/* ============================= */
-/* BOK */
-/* ============================= */
+/* =========================================
+   BRAND
+========================================= */
 
 .brand {
+
     text-align: center;
+
     margin-bottom: 24px;
 }
 
+
 .logo {
+
     color: #d71920;
-    font-size: 42px;
+
+    font-size: 44px;
+
     font-weight: 900;
-    letter-spacing: 3px;
+
+    letter-spacing: 4px;
+
     margin-bottom: 8px;
+
+    text-shadow:
+        0 5px 25px
+        rgba(215, 25, 32, 0.25);
 }
 
+
 .brand h1 {
+
     color: #ffffff;
+
     font-size: 24px;
+
     margin-bottom: 7px;
 }
 
+
 .brand p {
+
     color: #8e99aa;
+
     font-size: 14px;
 }
 
 
-/* ============================= */
-/* Card */
-/* ============================= */
+/* =========================================
+   CARD
+========================================= */
 
 .card {
+
     width: 100%;
 
-    background: #111722;
+    background:
+        linear-gradient(
+            145deg,
+            #131a26,
+            #0d121b
+        );
 
-    border: 1px solid #252d3a;
+    border: 1px solid #273142;
 
-    border-radius: 24px;
+    border-radius: 25px;
 
     padding: 25px 21px;
 
     box-shadow:
-        0 15px 45px rgba(0, 0, 0, 0.40);
+        0 20px 60px
+        rgba(0, 0, 0, 0.45);
+
+    backdrop-filter: blur(20px);
 }
 
 
-/* ============================= */
-/* Titles */
-/* ============================= */
-
 .card h2 {
+
     color: #ffffff;
 
     font-size: 21px;
@@ -100,13 +137,643 @@ body {
 }
 
 
-/* ============================= */
-/* Inputs */
-/* ============================= */
+/* =========================================
+   INPUT
+========================================= */
 
 input {
+
     width: 100%;
 
+    height: 52px;
+
+    background: #080d15;
+
+    border: 1px solid #303947;
+
+    border-radius: 14px;
+
+    color: #ffffff;
+
+    padding: 0 16px;
+
+    font-size: 16px;
+
+    outline: none;
+
+    margin-bottom: 14px;
+
+    direction: ltr;
+
+    text-align: center;
+
+    transition: 0.25s;
+}
+
+
+input::placeholder {
+
+    color: #687386;
+}
+
+
+input:focus {
+
+    border-color: #d71920;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(215, 25, 32, 0.12);
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+button {
+
+    width: 100%;
+
+    height: 52px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: #d71920;
+
+    color: #ffffff;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s,
+        opacity 0.2s,
+        box-shadow 0.2s;
+}
+
+
+button:hover {
+
+    opacity: 0.92;
+
+    box-shadow:
+        0 8px 25px
+        rgba(215, 25, 32, 0.20);
+}
+
+
+button:active {
+
+    transform: scale(0.98);
+}
+
+
+button:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    box-shadow: none;
+}
+
+
+/* =========================================
+   ACCOUNT HEADER
+========================================= */
+
+.accountHeader {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 22px;
+
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid #252d3a;
+}
+
+
+.accountHeader small {
+
+    display: block;
+
+    color: #7e899a;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+
+#userEmail {
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    direction: ltr;
+
+    text-align: right;
+
+    word-break: break-all;
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.message {
+
+    min-height: 20px;
+
+    text-align: center;
+
+    margin-top: 13px;
+
+    font-size: 14px;
+
+    color: #ff7777;
+}
+
+
+/* =========================================
+   RESULT
+========================================= */
+
+.result {
+
+    margin-top: 22px;
+
+    background: #0a0f17;
+
+    border: 1px solid #252d3a;
+
+    border-radius: 19px;
+
+    padding: 18px;
+}
+
+
+.resultTitle {
+
+    color: #d71920;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+
+    text-align: right;
+}
+
+
+.item {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid #202733;
+}
+
+
+.item:last-of-type {
+
+    border-bottom: none;
+}
+
+
+.item span {
+
+    color: #8994a5;
+
+    font-size: 14px;
+}
+
+
+.item strong {
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    text-align: left;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   RENEW DIVIDER
+========================================= */
+
+.renewDivider {
+
+    height: 1px;
+
+    margin:
+        18px 0 17px;
+
+    background:
+        linear-gradient(
+            to left,
+            transparent,
+            #d71920,
+            transparent
+        );
+}
+
+
+/* =========================================
+   RENEW TITLE
+========================================= */
+
+.renewTitle {
+
+    color: #ffffff;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    margin-bottom: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   RENEW OPTIONS
+========================================= */
+
+.renewOptions {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 7px;
+
+    margin-bottom: 12px;
+}
+
+
+.renewOption {
+
+    height: 44px;
+
+    background: #141b27;
+
+    border: 1px solid #303a4a;
+
+    border-radius: 11px;
+
+    color: #cbd2dc;
+
+    font-size: 12px;
+
+    padding: 0;
+}
+
+
+.renewOption:hover {
+
+    background: #1b2432;
+
+    box-shadow: none;
+}
+
+
+.renewOption.selected {
+
+    background: #d71920;
+
+    border-color: #d71920;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 7px 20px
+        rgba(215, 25, 32, 0.25);
+}
+
+
+/* =========================================
+   RENEW BUTTON
+========================================= */
+
+.renewButton {
+
+    margin-top: 4px;
+
+    height: 50px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d71920,
+            #a80f15
+        );
+}
+
+
+/* =========================================
+   SUCCESS OVERLAY
+========================================= */
+
+.successOverlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0, 0, 0, 0.72);
+
+    backdrop-filter: blur(10px);
+
+    animation:
+        fadeIn 0.2s ease;
+}
+
+
+.successModal {
+
+    width: 100%;
+
+    max-width: 350px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #171e2b,
+            #0d121b
+        );
+
+    border:
+        1px solid #303b4d;
+
+    border-radius: 25px;
+
+    padding: 30px 24px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 80px
+        rgba(0, 0, 0, 0.65);
+
+    animation:
+        modalIn 0.25s ease;
+}
+
+
+/* =========================================
+   SUCCESS ICON
+========================================= */
+
+.successIcon {
+
+    width: 65px;
+
+    height: 65px;
+
+    margin: 0 auto 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        rgba(215, 25, 32, 0.13);
+
+    border:
+        1px solid
+        rgba(215, 25, 32, 0.45);
+
+    color: #ff4a50;
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 0 35px
+        rgba(215, 25, 32, 0.13);
+}
+
+
+/* =========================================
+   SUCCESS TEXT
+========================================= */
+
+.successTitle {
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+
+.successLine {
+
+    width: 80px;
+
+    height: 3px;
+
+    margin: 0 auto 19px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            #d71920,
+            transparent
+        );
+}
+
+
+.successAccountLabel {
+
+    color: #8994a5;
+
+    font-size: 13px;
+
+    margin-bottom: 7px;
+}
+
+
+.successAccount {
+
+    color: #ffffff;
+
+    font-size: 28px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    direction: ltr;
+
+    margin-bottom: 12px;
+}
+
+
+.successText {
+
+    color: #9ba5b4;
+
+    font-size: 13px;
+
+    margin-bottom: 22px;
+}
+
+
+.successButton {
+
+    height: 48px;
+
+    font-size: 16px;
+}
+
+
+/* =========================================
+   HIDDEN
+========================================= */
+
+.hidden {
+
+    display: none !important;
+}
+
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes modalIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(0.92)
+            translateY(10px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            translateY(0);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+    body {
+
+        padding: 15px;
+    }
+
+
+    .card {
+
+        padding:
+            22px 17px;
+
+        border-radius: 22px;
+    }
+
+
+    .logo {
+
+        font-size: 38px;
+    }
+
+
+    .brand h1 {
+
+        font-size: 22px;
+    }
+
+
+    .renewOptions {
+
+        gap: 5px;
+    }
+
+
+    .renewOption {
+
+        font-size: 11px;
+    }
+
+}
     height: 52px;
 
     background: #080d15;
