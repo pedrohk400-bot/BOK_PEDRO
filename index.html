@@ -1,112 +1,54 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>BOK | فحص الحساب</title>
-
-    <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BOK</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="page">
+<div id="login">
+<h2>تسجيل الدخول</h2>
+<input id="email" type="email" placeholder="البريد الإلكتروني">
+<input id="password" type="password" placeholder="كلمة المرور">
+<button onclick="login()">دخول</button>
+<p id="loginMsg"></p>
+</div>
 
-    <!-- HEADER -->
-    <div class="brand">
+<div id="app" style="display:none">
+<h2>البحث عن حساب</h2>
+<input id="account" maxlength="7" inputmode="numeric" placeholder="رقم الحساب">
+<button onclick="search()">بحث</button>
+<p id="msg"></p>
 
-        <div class="logo">
-            BOK
-        </div>
+<div id="result" style="display:none">
+<p>الحساب: <b id="rAccount"></b></p>
+<p>الاسم: <b id="rName"></b></p>
+<p>الحالة: <b id="rActive"></b></p>
+<p>الاشتراك: <b id="rSub"></b></p>
+<p>البداية: <b id="rStart"></b></p>
+<p>النهاية: <b id="rEnd"></b></p>
 
-        <h1>
-            فحص الحساب
-        </h1>
+<select id="period">
+<option value="1">يوم واحد</option>
+<option value="7">أسبوع واحد</option>
+<option value="30">شهر واحد</option>
+<option value="90">3 شهور</option>
+<option value="365">12 شهر</option>
+</select>
 
-        <p>
-            الوصول إلى بيانات الحساب
-        </p>
+<button onclick="renew()">تجديد</button>
+</div>
+</div>
 
-    </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="./app.js"></script>
 
-
-    <!-- LOGIN -->
-    <div id="loginBox" class="card">
-
-        <h2>
-            تسجيل الدخول
-        </h2>
-
-        <input
-            id="email"
-            type="email"
-            placeholder="البريد الإلكتروني"
-            autocomplete="email"
-        >
-
-        <input
-            id="password"
-            type="password"
-            placeholder="كلمة المرور"
-            autocomplete="current-password"
-        >
-
-        <button
-            id="loginButton"
-            type="button"
-        >
-            تسجيل الدخول
-        </button>
-
-        <div
-            id="message"
-            class="message"
-        ></div>
-
-    </div>
-
-
-    <!-- SEARCH -->
-    <div id="searchBox" class="card hidden">
-
-        <div class="accountHeader">
-
-            <div>
-
-                <small>
-                    الحساب المسجل
-                </small>
-
-                <div id="userEmail">
-                    -
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <h2>
-            البحث عن حساب
-        </h2>
-
-
-        <input
-            id="accountNumber"
-            type="text"
-            inputmode="numeric"
-            maxlength="7"
-            placeholder="أدخل رقم الحساب المكوّن من 7 أرقام"
-        >
-
-
-        <button
+</body>
+</html>        <button
             id="searchButton"
             type="button"
         >
