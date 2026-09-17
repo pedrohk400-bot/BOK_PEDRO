@@ -2,7 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
 
-const serviceAccount = require("./serviceAccountKey.json");
+
+// =========================
+// Firebase Admin
+// =========================
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -10,6 +14,7 @@ admin.initializeApp({
 });
 
 const db = admin.database();
+
 const app = express();
 
 app.use(cors());
@@ -21,6 +26,7 @@ app.use(express.json());
 // =========================
 app.get("/api/account/:number", async function(req, res) {
   try {
+
     const number = req.params.number;
 
     if (!/^[0-9]{7}$/.test(number)) {
@@ -72,6 +78,7 @@ app.get("/api/account/:number", async function(req, res) {
     });
 
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
@@ -120,8 +127,10 @@ app.post("/api/renew", async function(req, res) {
 
     const oldEnd = Number(user.subscriptionEnd) || 0;
 
-    // إذا الاشتراك ما زال ساريًا، نمدد من نهايته
-    // وإذا انتهى، نبدأ من الوقت الحالي
+    // إذا الاشتراك ما زال ساريًا:
+    // نمدد من تاريخ نهايته.
+    // وإذا انتهى:
+    // نبدأ من الوقت الحالي.
     const start = oldEnd > now ? oldEnd : now;
 
     const date = new Date(start);
