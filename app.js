@@ -3,7 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
     getAuth,
     signInWithEmailAndPassword,
-    onAuthStateChanged
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
@@ -14,7 +15,7 @@ import {
 
 
 // ========================================
-// Firebase Configuration
+// Firebase
 // ========================================
 
 const firebaseConfig = {
@@ -28,20 +29,13 @@ const firebaseConfig = {
     measurementId: "G-26SMZR0QCC"
 };
 
-
-// ========================================
-// Initialize Firebase
-// ========================================
-
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getDatabase(app);
 
 
 // ========================================
-// Get HTML Elements
+// Elements
 // ========================================
 
 const loginBox = document.getElementById("loginBox");
@@ -50,63 +44,225 @@ const searchBox = document.getElementById("searchBox");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 
-const accountInput = document.getElementById("accountNumber");
-
 const loginButton = document.getElementById("loginButton");
 const searchButton = document.getElementById("searchButton");
 
+const accountInput = document.getElementById("accountNumber");
+
 const message = document.getElementById("message");
+const searchMessage = document.getElementById("searchMessage");
 
 const result = document.getElementById("result");
+
+const userEmail = document.getElementById("userEmail");
 
 
 // ========================================
 // Login
 // ========================================
 
-if (loginButton) {
+loginButton.addEventListener("click", async function () {
 
-    loginButton.addEventListener("click", async function () {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-
-        if (email === "" || password === "") {
-
-            message.textContent =
-                "أدخل البريد الإلكتروني وكلمة المرور";
-
-            return;
-        }
+    if (email === "" || password === "") {
 
         message.textContent =
-            "جاري تسجيل الدخول...";
+            "أدخل البريد الإلكتروني وكلمة المرور";
 
-        try {
+        return;
+    }
 
+    message.textContent =
+        "جاري تسجيل الدخول...";
+
+    try {
+
+        const resultLogin =
             await signInWithEmailAndPassword(
                 auth,
                 email,
                 password
             );
 
-            message.textContent = "";
+        message.textContent = "";
 
-        } catch (error) {
-
-            console.log(error);
-
-            message.textContent =
-                "البريد الإلكتروني أو كلمة المرور غير صحيحة";
-
+        if (resultLogin.user) {
+            userEmail.textContent =
+                resultLogin.user.email;
         }
 
-    });
+    } catch (error) {
 
-}
+        console.log(error);
+
+        message.textContent =
+            "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+    }
+
+});
 
 
 // ========================================
+// Authentication State
+// ========================================
+
+onAuthStateChanged(auth, function (user) {
+
+    if (user) {
+
+        loginBox.classList.add("hidden");
+
+        searchBox.classList.remove("hidden");
+
+        userEmail.textContent =
+            user.email || "-";
+
+    } else {
+
+        loginBox.classList.remove("hidden");
+
+        searchBox.classList.add("hidden");
+
+        result.classList.add("hidden");
+
+    }
+
+});
+
+
+// ========================================
+// Search Account
+// ========================================
+
+searchButton.addEventListener("click", async function () {
+
+    const user = auth.currentUser;
+
+    if (!user) {
+
+        searchMessage.textContent =
+            "يجب تسجيل الدخول أولاً";
+
+        return;
+    }
+
+
+    const accountNumber =
+        accountInput.value.trim();
+
+
+    // ========================================
+    // Validate Account
+    // ========================================
+
+    if (!/^\d{7}$/.test(accountNumber)) {
+
+        searchMessage.textContent =
+            "أدخل رقم حساب صحيح مكوّن من 7 أرقام";
+
+        result.classList.add("hidden");
+
+        return;
+    }
+
+
+    searchMessage.textContent =
+        "جاري البحث...";
+
+    result.classList.add("hidden");
+
+
+    try {
+
+        // ========================================
+        // Read Current User
+        // ========================================
+
+        const userRef =
+            ref(db, "users/" + user.uid);
+
+        const snapshot =
+            await get(userRef);
+
+
+        if (!snapshot.exists()) {
+
+            searchMessage.textContent =
+                "لا توجد بيانات لهذا المستخدم";
+
+            return;
+        }
+
+
+        const data =
+            snapshot.val();
+
+
+        // ========================================
+        // Compare Account Number
+        // ========================================
+
+        if (
+            String(data.accountNumber) !==
+            accountNumber
+        ) {
+
+            searchMessage.textContent =
+                "رقم الحساب غير مطابق للحساب المسجل";
+
+            return;
+        }
+
+
+        // ========================================
+        // Show Account Data
+        // ========================================
+
+        document.getElementById("resultAccount").textContent =
+            data.accountNumber || "-";
+
+        document.getElementById("resultName").textContent =
+            data.username || "-";
+
+        document.getElementById("resultStatus").textContent =
+            data.active ? "نشط" : "غير نشط";
+
+        document.getElementById("resultSubscription").textContent =
+            data.subscriptionName || "-";
+
+
+        result.classList.remove("hidden");
+
+        searchMessage.textContent = "";
+
+
+    } catch (error) {
+
+        console.log(error);
+
+        searchMessage.textContent =
+            "حدث خطأ أثناء الاتصال بقاعدة البيانات";
+
+    }
+
+});
+
+
+// ========================================
+// Enter Key Search
+// ========================================
+
+accountInput.addEventListener("keydown", function (event) {
+
+    if (event.key === "Enter") {
+
+        searchButton.click();
+
+    }
+
+});// ========================================
 // Authentication State
 // ========================================
 
