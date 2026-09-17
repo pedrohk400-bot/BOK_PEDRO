@@ -13,129 +13,181 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.database();
 
-let currentUid=null;
-let currentAccountNumber=null;
-let currentUserData=null;
-let selectedRenewal=null;
-
-const emailInput=document.getElementById("email");
-const passwordInput=document.getElementById("password");
 const loginBox=document.getElementById("login");
-const searchBox=document.getElementById("app");
-const loginMsg=document.getElementById("loginMsg");
-const accountInput=document.getElementById("account");
-const msg=document.getElementById("msg");
-const result=document.getElementById("result");
+const appBox=document.getElementById("app");
+const loginBtn=document.getElementById("loginBtn");
+const searchBtn=document.getElementById("searchBtn");
+const renewBtn=document.getElementById("renewBtn");
 
-function login(){
-const e=emailInput.value.trim();
-const p=passwordInput.value;
+let currentUid=null;
+let currentAccount=null;
+let currentData=null;
+
+loginBtn.onclick=function(){
+
+const e=document.getElementById("email").value.trim();
+const p=document.getElementById("password").value;
+const m=document.getElementById("loginMsg");
 
 if(!e||!p){
-loginMsg.textContent="أدخل البريد الإلكتروني وكلمة المرور";
+m.textContent="أدخل البريد وكلمة المرور";
 return;
 }
 
-loginMsg.textContent="جاري التحقق...";
+loginBtn.disabled=true;
+loginBtn.textContent="جاري الدخول...";
 
 auth.signInWithEmailAndPassword(e,p)
-.then(()=>{
-loginBox.style.display="none";
-searchBox.style.display="block";
-loginMsg.textContent="";
+.then(function(){
+m.textContent="";
 })
-.catch(error=>{
-loginMsg.textContent="بيانات الدخول غير صحيحة";
-console.error(error);
+.catch(function(error){
+m.textContent="بيانات الدخول غير صحيحة";
+console.log(error);
+})
+.finally(function(){
+loginBtn.disabled=false;
+loginBtn.textContent="دخول";
 });
-}
+};
 
-auth.onAuthStateChanged(user=>{
+auth.onAuthStateChanged(function(user){
+
 if(user){
-currentUid=user.uid;
-loginBox.style.display="none";
-searchBox.style.display="block";
+loginBox.classList.add("hidden");
+appBox.classList.remove("hidden");
 }else{
-currentUid=null;
-loginBox.style.display="block";
-searchBox.style.display="none";
+loginBox.classList.remove("hidden");
+appBox.classList.add("hidden");
 }
 });
 
-function search(){
-const n=accountInput.value.trim();
 
-if(!/^[0-9]{7}$/.test(n)){
-msg.textContent="أدخل رقم حساب مكون من 7 أرقام";
+searchBtn.onclick=function(){
+
+const number=document.getElementById("account").value.trim();
+const message=document.getElementById("msg");
+
+if(!/^[0-9]{7}$/.test(number)){
+message.textContent="أدخل رقم حساب مكون من 7 أرقام";
 return;
 }
 
-msg.textContent="جاري البحث...";
+searchBtn.disabled=true;
+searchBtn.textContent="جاري البحث...";
+message.textContent="";
 
-db.ref("accountNumbers/"+n).once("value")
-.then(a=>{
-if(!a.exists())throw new Error("رقم الحساب غير موجود");
+db.ref("accountNumbers/"+number).once("value")
+.then(function(a){
+
+if(!a.exists())
+throw new Error("رقم الحساب غير موجود");
 
 const uid=a.val().uid;
-if(!uid)throw new Error("لا يوجد مستخدم مرتبط بالحساب");
+
+if(!uid)
+throw new Error("الحساب غير مرتبط بمستخدم");
 
 currentUid=uid;
-currentAccountNumber=n;
+currentAccount=number;
 
 return db.ref("users/"+uid).once("value");
+
 })
-.then(u=>{
-if(!u.exists())throw new Error("بيانات الحساب غير موجودة");
+.then(function(u){
 
-currentUserData=u.val();
+if(!u.exists())
+throw new Error("بيانات الحساب غير موجودة");
 
-set("rAccount",currentAccountNumber);
-set("rName",currentUserData.username);
-set("rActive",currentUserData.active?"مفعل":"غير مفعل");
-set("rSub",currentUserData.subscriptionName);
-set("rStart",date(currentUserData.subscriptionStart));
-set("rEnd",date(currentUserData.subscriptionEnd));
+currentData=u.val();
 
-result.style.display="block";
-msg.textContent="تم العثور على الحساب";
+document.getElementById("rAccount").textContent=currentAccount;
+document.getElementById("rName").textContent=currentData.username||"-";
+document.getElementById("rActive").textContent=currentData.active?"مفعل":"غير مفعل";
+document.getElementById("rSub").textContent=currentData.subscriptionName||"-";
+document.getElementById("rStart").textContent=formatDate(currentData.subscriptionStart);
+document.getElementById("rEnd").textContent=formatDate(currentData.subscriptionEnd);
+
+document.getElementById("result").classList.remove("hidden");
+
+message.textContent="تم العثور على الحساب";
+
 })
-.catch(e=>msg.textContent=e.message);
+.catch(function(error){
+
+message.textContent=error.message;
+
+})
+.finally(function(){
+
+searchBtn.disabled=false;
+searchBtn.textContent="بحث";
+
+});
+};
+
+
+renewBtn.onclick=function(){
+
+if(!currentUid||!currentData){
+alert("ابحث عن الحساب أولاً");
+return;
 }
 
-function renew(){
-if(!currentUid||!currentUserData)return;
-
 const days=Number(document.getElementById("period").value);
+
 const now=Date.now();
-const old=Number(currentUserData.subscriptionEnd)||0;
-const start=old>now?old:now;
-const end=start+days*86400000;
+
+const oldEnd=Number(currentData.subscriptionEnd)||0;
+
+const start=oldEnd>now?oldEnd:now;
+
+const end=start+(days*86400000);
+
+renewBtn.disabled=true;
+renewBtn.textContent="جاري التجديد...";
 
 db.ref("users/"+currentUid).update({
+
 active:true,
 subscriptionStart:start,
 subscriptionEnd:end,
 subscriptionName:document.getElementById("period").selectedOptions[0].text
+
 })
-.then(()=>{
-currentUserData.subscriptionEnd=end;
-currentUserData.subscriptionStart=start;
-currentUserData.active=true;
+.then(function(){
 
-set("rActive","مفعل");
-set("rSub",currentUserData.subscriptionName);
-set("rStart",date(start));
-set("rEnd",date(end));
+currentData.active=true;
+currentData.subscriptionStart=start;
+currentData.subscriptionEnd=end;
 
-alert("تم تجديد الاشتراك بنجاح");
+document.getElementById("rActive").textContent="مفعل";
+document.getElementById("rSub").textContent=currentData.subscriptionName;
+document.getElementById("rStart").textContent=formatDate(start);
+document.getElementById("rEnd").textContent=formatDate(end);
+
+alert("تم تجديد الاشتراك بنجاح\nحساب رقم: "+currentAccount);
+
 })
-.catch(e=>alert("تعذر التجديد: "+e.message));
-}
+.catch(function(error){
 
-function set(id,value){
-document.getElementById(id).textContent=value||"—";
-}
+alert("تعذر التجديد: "+error.message);
 
-function date(x){
-return x?new Date(x).toLocaleString("ar"):"—";
+})
+.finally(function(){
+
+renewBtn.disabled=false;
+renewBtn.textContent="تجديد الاشتراك";
+
+});
+};
+
+
+function formatDate(timestamp){
+
+if(!timestamp)
+return "-";
+
+return new Date(Number(timestamp)).toLocaleString("ar");
+
 }
