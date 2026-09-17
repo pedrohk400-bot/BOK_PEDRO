@@ -13,12 +13,23 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-const loginBox = document.getElementById("login");
-const appBox = document.getElementById("app");
+const ADMIN_UID =
+    "s78AZc7ginWouJcYLI3cIRs1lAZ2";
 
-const loginBtn = document.getElementById("loginBtn");
-const searchBtn = document.getElementById("searchBtn");
-const renewBtn = document.getElementById("renewBtn");
+const loginBox =
+    document.getElementById("login");
+
+const appBox =
+    document.getElementById("app");
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const searchBtn =
+    document.getElementById("searchBtn");
+
+const renewBtn =
+    document.getElementById("renewBtn");
 
 let uid = null;
 let account = null;
@@ -26,15 +37,7 @@ let data = null;
 
 
 /* =========================================
-   عند فتح الموقع
-   تسجيل خروج الجلسة القديمة
-========================================= */
-
-auth.signOut().catch(function () {});
-
-
-/* =========================================
-   إظهار تسجيل الدخول
+   بداية الموقع
 ========================================= */
 
 loginBox.classList.remove("hidden");
@@ -48,10 +51,12 @@ appBox.classList.add("hidden");
 loginBtn.onclick = function () {
 
     const email =
-        document.getElementById("email").value.trim();
+        document.getElementById("email")
+        .value.trim();
 
     const password =
-        document.getElementById("password").value;
+        document.getElementById("password")
+        .value;
 
     const msg =
         document.getElementById("loginMsg");
@@ -71,7 +76,23 @@ loginBtn.onclick = function () {
         password
     )
 
-    .then(function () {
+    .then(function (result) {
+
+        const user = result.user;
+
+        /* التأكد أن هذا هو حساب الإدارة */
+
+        if (user.uid !== ADMIN_UID) {
+
+            return auth.signOut()
+            .then(function () {
+
+                throw new Error(
+                    "هذا الحساب ليس حساب الإدارة"
+                );
+
+            });
+        }
 
         loginBox.classList.add("hidden");
         appBox.classList.remove("hidden");
@@ -82,10 +103,18 @@ loginBtn.onclick = function () {
 
     .catch(function (error) {
 
-        console.log("LOGIN ERROR:", error);
+        console.log(
+            "LOGIN ERROR:",
+            error
+        );
 
         msg.textContent =
-            "بيانات الدخول غير صحيحة";
+            error.message ===
+            "هذا الحساب ليس حساب الإدارة"
+
+            ? error.message
+
+            : "بيانات الدخول غير صحيحة";
 
     })
 
@@ -99,16 +128,10 @@ loginBtn.onclick = function () {
 
 
 /* =========================================
-   مراقبة حالة تسجيل الدخول
+   حالة Firebase
 ========================================= */
 
 auth.onAuthStateChanged(function (user) {
-
-    /*
-       مهم:
-       لا نغير الشاشة هنا.
-       تسجيل الدخول هو الذي يغيرها.
-    */
 
     if (!user) {
 
@@ -118,7 +141,26 @@ auth.onAuthStateChanged(function (user) {
         uid = null;
         account = null;
         data = null;
+
+        return;
     }
+
+    /* إذا كان حساب الإدارة */
+
+    if (user.uid === ADMIN_UID) {
+
+        loginBox.classList.add("hidden");
+        appBox.classList.remove("hidden");
+
+        return;
+    }
+
+    /* أي حساب آخر */
+
+    auth.signOut();
+
+    loginBox.classList.remove("hidden");
+    appBox.classList.add("hidden");
 
 });
 
@@ -148,18 +190,14 @@ searchBtn.onclick = function () {
     searchBtn.textContent =
         "جاري البحث...";
 
-    msg.textContent = "";
-
     db.ref(
         "accountNumbers/" + number
     )
-
     .once("value")
 
     .then(function (snap) {
 
         if (!snap.exists()) {
-
             throw new Error(
                 "رقم الحساب غير موجود"
             );
@@ -168,21 +206,14 @@ searchBtn.onclick = function () {
         const accountData =
             snap.val();
 
-        if (
-            !accountData ||
-            !accountData.uid
-        ) {
-
+        if (!accountData.uid) {
             throw new Error(
                 "الحساب غير مرتبط بمستخدم"
             );
         }
 
-        uid =
-            accountData.uid;
-
-        account =
-            number;
+        uid = accountData.uid;
+        account = number;
 
         return db.ref(
             "users/" + uid
@@ -193,19 +224,16 @@ searchBtn.onclick = function () {
     .then(function (snap) {
 
         if (!snap.exists()) {
-
             throw new Error(
                 "الحساب محذوف ولا يمكن تجديده"
             );
         }
 
-        data =
-            snap.val();
+        data = snap.val();
 
         document.getElementById(
             "rAccount"
-        ).textContent =
-            account;
+        ).textContent = account;
 
         document.getElementById(
             "rName"
@@ -216,8 +244,8 @@ searchBtn.onclick = function () {
             "rActive"
         ).textContent =
             data.active
-                ? "مفعل"
-                : "غير مفعل";
+            ? "مفعل"
+            : "غير مفعل";
 
         document.getElementById(
             "rSub"
@@ -249,11 +277,6 @@ searchBtn.onclick = function () {
 
     .catch(function (error) {
 
-        console.log(
-            "SEARCH ERROR:",
-            error
-        );
-
         msg.textContent =
             error.message;
 
@@ -262,16 +285,14 @@ searchBtn.onclick = function () {
     .finally(function () {
 
         searchBtn.disabled = false;
-
-        searchBtn.textContent =
-            "بحث";
+        searchBtn.textContent = "بحث";
 
     });
 };
 
 
 /* =========================================
-   زر التجديد
+   التجديد
 ========================================= */
 
 renewBtn.onclick = function () {
@@ -286,39 +307,38 @@ renewBtn.onclick = function () {
         return;
     }
 
-    const period =
-        document.getElementById("period");
+    /* التأكد من أن الإدارة هي التي تعمل */
 
-    const selected =
-        period.options[
-            period.selectedIndex
-        ];
-
-    if (!selected) {
+    if (
+        !auth.currentUser ||
+        auth.currentUser.uid !== ADMIN_UID
+    ) {
 
         showErrorDialog(
             "خطأ",
-            "اختر مدة الاشتراك"
+            "حساب الإدارة غير مصرح"
         );
 
         return;
     }
 
+    const period =
+        document.getElementById("period");
+
     const text =
-        selected.textContent.trim();
+        period.options[
+            period.selectedIndex
+        ].textContent.trim();
 
-    let type = "";
-    let name = "";
-
+    let type;
+    let name;
 
     if (text.includes("يوم")) {
 
         type = "day";
         name = "يوم واحد";
 
-    }
-
-    else if (
+    } else if (
         text.includes("أسبوع") ||
         text.includes("اسبوع")
     ) {
@@ -326,9 +346,7 @@ renewBtn.onclick = function () {
         type = "week";
         name = "أسبوع واحد";
 
-    }
-
-    else if (
+    } else if (
         text.includes("12") &&
         text.includes("شهر")
     ) {
@@ -336,9 +354,7 @@ renewBtn.onclick = function () {
         type = "12months";
         name = "12 شهر";
 
-    }
-
-    else if (
+    } else if (
         text.includes("3") &&
         text.includes("شهر")
     ) {
@@ -346,18 +362,14 @@ renewBtn.onclick = function () {
         type = "3months";
         name = "3 شهور";
 
-    }
-
-    else if (
+    } else if (
         text.includes("شهر")
     ) {
 
         type = "month";
         name = "شهر واحد";
 
-    }
-
-    else {
+    } else {
 
         showErrorDialog(
             "خطأ",
@@ -367,32 +379,26 @@ renewBtn.onclick = function () {
         return;
     }
 
-
     renewBtn.disabled = true;
     renewBtn.textContent =
         "جاري التجديد...";
 
-
-    const userRef =
+    const ref =
         db.ref("users/" + uid);
 
-
-    userRef.once("value")
+    ref.once("value")
 
     .then(function (snap) {
 
         if (!snap.exists()) {
-
             throw new Error(
                 "الحساب محذوف ولا يمكن تجديده"
             );
         }
 
-        const user =
-            snap.val();
+        const user = snap.val();
 
-        const now =
-            Date.now();
+        const now = Date.now();
 
         const oldEnd =
             Number(
@@ -401,59 +407,41 @@ renewBtn.onclick = function () {
 
         const start =
             oldEnd > now
-                ? oldEnd
-                : now;
+            ? oldEnd
+            : now;
 
         const endDate =
             new Date(start);
 
-
-        if (type === "day") {
-
+        if (type === "day")
             endDate.setDate(
                 endDate.getDate() + 1
             );
 
-        }
-
-        else if (type === "week") {
-
+        else if (type === "week")
             endDate.setDate(
                 endDate.getDate() + 7
             );
 
-        }
-
-        else if (type === "month") {
-
+        else if (type === "month")
             endDate.setMonth(
                 endDate.getMonth() + 1
             );
 
-        }
-
-        else if (type === "3months") {
-
+        else if (type === "3months")
             endDate.setMonth(
                 endDate.getMonth() + 3
             );
 
-        }
-
-        else if (type === "12months") {
-
+        else if (type === "12months")
             endDate.setFullYear(
                 endDate.getFullYear() + 1
             );
 
-        }
-
-
         const end =
             endDate.getTime();
 
-
-        return userRef.update({
+        return ref.update({
 
             active: true,
 
@@ -493,13 +481,11 @@ renewBtn.onclick = function () {
             ).textContent =
                 formatDate(end);
 
-
             showSuccessDialog(
                 account,
                 name,
                 formatDate(end)
             );
-
         });
 
     })
@@ -513,31 +499,20 @@ renewBtn.onclick = function () {
 
         if (
             error.code ===
-            "PERMISSION_DENIED" ||
-            String(
-                error.message
-            )
-            .toLowerCase()
-            .includes(
-                "permission denied"
-            )
+            "PERMISSION_DENIED"
         ) {
 
             showErrorDialog(
                 "خطأ في الصلاحيات",
-                "ليس لديك صلاحية لتجديد هذا الحساب"
+                "حساب الإدارة غير مصرح له"
             );
 
-        }
-
-        else {
+        } else {
 
             showErrorDialog(
                 "خطأ",
-                error.message ||
-                "تعذر تجديد الاشتراك"
+                error.message
             );
-
         }
 
     })
@@ -545,71 +520,49 @@ renewBtn.onclick = function () {
     .finally(function () {
 
         renewBtn.disabled = false;
-
         renewBtn.textContent =
             "تجديد الاشتراك";
 
     });
-
 };
 
 
 /* =========================================
-   تنسيق التاريخ
+   التاريخ
 ========================================= */
 
 function formatDate(timestamp) {
 
-    if (
-        timestamp === null ||
-        timestamp === undefined ||
-        timestamp === ""
-    ) {
+    if (!timestamp) return "-";
+
+    const d =
+        new Date(Number(timestamp));
+
+    if (isNaN(d.getTime()))
         return "-";
-    }
 
-    const date =
-        new Date(
-            Number(timestamp)
-        );
-
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-        return "-";
-    }
-
-    return date.toLocaleString("ar");
+    return d.toLocaleString("ar");
 }
 
 
 /* =========================================
-   رسالة النجاح
+   الرسائل
 ========================================= */
 
 function showSuccessDialog(
-    accountNumber,
-    periodName,
-    endDate
+    account,
+    period,
+    end
 ) {
 
     alert(
         "تم تجديد الاشتراك بنجاح\n\n" +
-        "رقم الحساب: " +
-        accountNumber +
-        "\n\nالمدة: " +
-        periodName +
-        "\n\nينتهي في: " +
-        endDate
+        "رقم الحساب: " + account +
+        "\n\nالمدة: " + period +
+        "\n\nينتهي في: " + end
     );
 }
 
-
-/* =========================================
-   رسالة الخطأ
-========================================= */
 
 function showErrorDialog(
     title,
@@ -617,8 +570,6 @@ function showErrorDialog(
 ) {
 
     alert(
-        title +
-        "\n\n" +
-        message
+        title + "\n\n" + message
     );
 }
