@@ -375,7 +375,7 @@ select {
 
 
 /* ==========================================
-   IOS DIALOG
+   IOS GLASS DIALOG
 ========================================== */
 
 #iosSuccessDialog,
@@ -384,16 +384,7 @@ select {
     position:
         fixed !important;
 
-    top:
-        0 !important;
-
-    right:
-        0 !important;
-
-    bottom:
-        0 !important;
-
-    left:
+    inset:
         0 !important;
 
     width:
@@ -425,14 +416,16 @@ select {
             0,
             0,
             0,
-            .58
+            .38
         ) !important;
 
     backdrop-filter:
-        blur(20px);
+        blur(18px)
+        saturate(150%);
 
     -webkit-backdrop-filter:
-        blur(20px);
+        blur(18px)
+        saturate(150%);
 
     opacity:
         0;
@@ -464,7 +457,7 @@ select {
 
 
 /* ==========================================
-   DIALOG BOX
+   GLASS BOX
 ========================================== */
 
 #iosSuccessDialog .ios-dialog,
@@ -474,23 +467,33 @@ select {
         100% !important;
 
     max-width:
-        370px !important;
+        350px !important;
 
     margin:
         0 !important;
 
     padding:
-        28px 22px 20px !important;
+        28px 20px 20px !important;
 
     border-radius:
-        28px !important;
+        30px !important;
 
     background:
-        rgba(
-            24,
-            30,
-            42,
-            .97
+
+        linear-gradient(
+            145deg,
+            rgba(
+                255,
+                255,
+                255,
+                .16
+            ),
+            rgba(
+                255,
+                255,
+                255,
+                .07
+            )
         ) !important;
 
     border:
@@ -499,17 +502,17 @@ select {
             255,
             255,
             255,
-            .10
+            .18
         ) !important;
 
     box-shadow:
 
-        0 25px 80px
+        0 30px 80px
         rgba(
             0,
             0,
             0,
-            .60
+            .55
         ),
 
         inset 0 1px 0
@@ -517,17 +520,34 @@ select {
             255,
             255,
             255,
-            .07
+            .18
+        ),
+
+        inset 0 -1px 0
+        rgba(
+            255,
+            255,
+            255,
+            .04
         ) !important;
+
+    backdrop-filter:
+        blur(35px)
+        saturate(160%);
+
+    -webkit-backdrop-filter:
+        blur(35px)
+        saturate(160%);
 
     text-align:
         center !important;
 
     transform:
-        scale(.88);
+        translateY(15px)
+        scale(.94);
 
     transition:
-        transform .28s
+        transform .32s
         cubic-bezier(
             .2,
             .8,
@@ -541,6 +561,7 @@ select {
 #iosErrorDialog.show .ios-dialog {
 
     transform:
+        translateY(0)
         scale(1);
 }
 
@@ -553,10 +574,10 @@ select {
 .ios-success-icon {
 
     width:
-        76px !important;
+        72px !important;
 
     height:
-        76px !important;
+        72px !important;
 
     margin:
         0 auto 18px !important;
@@ -574,16 +595,54 @@ select {
         center !important;
 
     background:
-        #19c37d !important;
+        rgba(
+            52,
+            211,
+            153,
+            .18
+        ) !important;
+
+    border:
+        1px solid
+        rgba(
+            52,
+            211,
+            153,
+            .35
+        ) !important;
 
     box-shadow:
-        0 10px 35px
+
+        0 0 0 8px
         rgba(
-            25,
-            195,
-            125,
-            .30
+            52,
+            211,
+            153,
+            .05
+        ),
+
+        0 12px 35px
+        rgba(
+            52,
+            211,
+            153,
+            .22
         ) !important;
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    animation:
+        successPop .45s
+        cubic-bezier(
+            .2,
+            .8,
+            .2,
+            1
+        );
 }
 
 
@@ -591,16 +650,25 @@ select {
 .ios-success-icon span {
 
     color:
-        #fff !important;
+        #34d399 !important;
 
     font-size:
-        43px !important;
+        42px !important;
 
     font-weight:
         700 !important;
 
     line-height:
         1 !important;
+
+    text-shadow:
+        0 0 18px
+        rgba(
+            52,
+            211,
+            153,
+            .45
+        );
 }
 
 
@@ -612,10 +680,10 @@ select {
 .ios-error-icon {
 
     width:
-        76px !important;
+        72px !important;
 
     height:
-        76px !important;
+        72px !important;
 
     margin:
         0 auto 18px !important;
@@ -633,15 +701,38 @@ select {
         center !important;
 
     background:
-        #d71920 !important;
+        rgba(
+            255,
+            70,
+            70,
+            .13
+        ) !important;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            80,
+            80,
+            .30
+        ) !important;
 
     box-shadow:
-        0 10px 35px
+
+        0 0 0 8px
+        rgba(
+            255,
+            70,
+            70,
+            .04
+        ),
+
+        0 12px 35px
         rgba(
             215,
             25,
             32,
-            .30
+            .20
         ) !important;
 }
 
@@ -650,16 +741,48 @@ select {
 .ios-error-icon span {
 
     color:
-        #fff !important;
+        #ff5c5c !important;
 
     font-size:
-        40px !important;
+        38px !important;
 
     font-weight:
         700 !important;
 
     line-height:
         1 !important;
+}
+
+
+/* ==========================================
+   SUCCESS ANIMATION
+========================================== */
+
+@keyframes successPop {
+
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            scale(.65);
+    }
+
+    70% {
+
+        transform:
+            scale(1.08);
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1);
+    }
 }
 
 
@@ -674,19 +797,22 @@ select {
 .ios-dialog-title {
 
     margin:
-        0 0 8px 0 !important;
+        0 0 7px 0 !important;
 
     color:
         #fff !important;
 
     font-size:
-        22px !important;
+        21px !important;
 
     font-weight:
         700 !important;
 
     line-height:
-        1.3 !important;
+        1.35 !important;
+
+    letter-spacing:
+        -.2px;
 }
 
 
@@ -704,18 +830,23 @@ select {
         0 0 20px 0 !important;
 
     color:
-        #9ba5b5 !important;
+        rgba(
+            255,
+            255,
+            255,
+            .65
+        ) !important;
 
     font-size:
         14px !important;
 
     line-height:
-        1.6 !important;
+        1.65 !important;
 }
 
 
 /* ==========================================
-   INFO
+   SUCCESS INFO BOX
 ========================================== */
 
 #iosSuccessDialog
@@ -731,14 +862,14 @@ select {
         hidden !important;
 
     border-radius:
-        18px !important;
+        19px !important;
 
     background:
         rgba(
             255,
             255,
             255,
-            .045
+            .055
         ) !important;
 
     border:
@@ -747,10 +878,23 @@ select {
             255,
             255,
             255,
-            .06
+            .08
         ) !important;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(
+            255,
+            255,
+            255,
+            .05
+        );
 }
 
+
+/* ==========================================
+   INFO ROW
+========================================== */
 
 #iosSuccessDialog
 .ios-row {
@@ -759,7 +903,7 @@ select {
         100% !important;
 
     min-height:
-        50px !important;
+        49px !important;
 
     display:
         flex !important;
@@ -782,7 +926,7 @@ select {
             255,
             255,
             255,
-            .06
+            .055
         ) !important;
 }
 
@@ -799,10 +943,15 @@ select {
 .ios-row span {
 
     color:
-        #8994a5 !important;
+        rgba(
+            255,
+            255,
+            255,
+            .48
+        ) !important;
 
     font-size:
-        14px !important;
+        13px !important;
 }
 
 
@@ -840,7 +989,7 @@ button.ios-ok {
         100% !important;
 
     height:
-        52px !important;
+        50px !important;
 
     margin:
         0 !important;
@@ -849,28 +998,70 @@ button.ios-ok {
         0 !important;
 
     border:
-        0 !important;
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .12
+        ) !important;
 
     border-radius:
         16px !important;
 
     background:
-        #d71920 !important;
+        rgba(
+            255,
+            255,
+            255,
+            .10
+        ) !important;
 
     color:
         #fff !important;
 
     font-size:
-        17px !important;
+        16px !important;
 
     font-weight:
-        700 !important;
+        600 !important;
 
     cursor:
         pointer !important;
 
     outline:
         none !important;
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(
+            255,
+            255,
+            255,
+            .12
+        );
+}
+
+
+#iosSuccessDialog
+button.ios-ok {
+
+    color:
+        #34d399 !important;
+}
+
+
+#iosErrorDialog
+button.ios-ok {
+
+    color:
+        #ff6868 !important;
 }
 
 
@@ -881,10 +1072,10 @@ button.ios-ok:active,
 button.ios-ok:active {
 
     transform:
-        scale(.97);
+        scale(.96) !important;
 
     opacity:
-        .85;
+        .75 !important;
 }
 
 
@@ -911,6 +1102,14 @@ button.ios-ok:active {
     }
 
 
+    #iosSuccessDialog,
+    #iosErrorDialog {
+
+        padding:
+            16px !important;
+    }
+
+
     #iosSuccessDialog
     .ios-dialog,
 
@@ -918,10 +1117,13 @@ button.ios-ok:active {
     .ios-dialog {
 
         max-width:
-            100%;
+            100% !important;
 
         border-radius:
-            26px;
+            28px !important;
+
+        padding:
+            26px 18px 18px !important;
     }
 }
 
