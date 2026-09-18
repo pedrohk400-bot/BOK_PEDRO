@@ -1,659 +1,810 @@
+/* =========================================================
+   BOK-PED
+   iOS PREMIUM STYLE
+   ========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+    --ios-red: #ff453a;
+    --ios-green: #30d158;
+    --ios-blue: #0a84ff;
+
+    --bg: #050608;
+    --text: #ffffff;
+    --secondary: rgba(235, 235, 245, .60);
+    --tertiary: rgba(235, 235, 245, .36);
+
+    --glass: rgba(255, 255, 255, .075);
+    --glass-strong: rgba(255, 255, 255, .105);
+    --glass-border: rgba(255, 255, 255, .12);
+
+    --radius-xl: 32px;
+    --radius-lg: 24px;
+    --radius-md: 18px;
+
+    --shadow:
+        0 30px 80px rgba(0,0,0,.55),
+        0 10px 30px rgba(0,0,0,.25);
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+html {
+    width: 100%;
+    min-height: 100%;
+    background: var(--bg);
+    scroll-behavior: smooth;
+}
 
 body {
+    width: 100%;
+    min-height: 100vh;
+
+    direction: rtl;
 
     font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "Helvetica Neue",
         Arial,
         sans-serif;
 
+    color: var(--text);
+
     background:
-        #070a10;
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(255,69,58,.13),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(10,132,255,.12),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(48,209,88,.07),
+            transparent 35%
+        ),
+        #050608;
 
-    color:
-        #fff;
-
-    min-height:
-        100vh;
-
-    display:
-        flex;
-
-    justify-content:
-        center;
-
-    align-items:
-        center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     padding:
-        20px;
+        max(18px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(18px, env(safe-area-inset-left));
 
-    direction:
-        rtl;
+    overflow-x: hidden;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* =========================================================
+   BACKGROUND LIGHT EFFECT
+   ========================================================= */
+
+body::before {
+    content: "";
+
+    position: fixed;
+
+    width: 260px;
+    height: 260px;
+
+    top: -100px;
+    right: -80px;
+
+    background: rgba(255,69,58,.10);
+
+    filter: blur(70px);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+body::after {
+    content: "";
+
+    position: fixed;
+
+    width: 260px;
+    height: 260px;
+
+    bottom: -120px;
+    left: -90px;
+
+    background: rgba(10,132,255,.09);
+
+    filter: blur(80px);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 .page {
+    position: relative;
 
-    width:
-        100%;
+    width: 100%;
+    max-width: 440px;
 
-    max-width:
-        430px;
+    z-index: 1;
+
+    animation: pageIn .55s cubic-bezier(.2,.8,.2,1);
 }
 
-
-.card {
-
-    background:
-        #111722;
-
-    border:
-        1px solid #293241;
-
-    border-radius:
-        24px;
-
-    padding:
-        25px;
-
-    box-shadow:
-        0 20px 60px #0008;
-}
-
-
-.card h2 {
-
-    text-align:
-        center;
-
-    margin-bottom:
-        20px;
-
-    font-size:
-        23px;
-}
-
-
-input,
-select {
-
-    width:
-        100%;
-
-    height:
-        52px;
-
-    margin-bottom:
-        14px;
-
-    border-radius:
-        14px;
-
-    border:
-        1px solid #303947;
-
-    background:
-        #080d15;
-
-    color:
-        #fff;
-
-    padding:
-        0 15px;
-
-    font-size:
-        16px;
-
-    text-align:
-        center;
-
-    outline:
-        none;
-
-    font-family:
-        Arial,
-        sans-serif;
-}
-
-
-input:focus,
-select:focus {
-
-    border-color:
-        #d71920;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(
-            215,
-            25,
-            32,
-            .12
-        );
-}
-
-
-input::placeholder {
-
-    color:
-        #697386;
-}
-
-
-button {
-
-    width:
-        100%;
-
-    height:
-        52px;
-
-    border:
-        0;
-
-    border-radius:
-        14px;
-
-    background:
-        #d71920;
-
-    color:
-        #fff;
-
-    font-size:
-        17px;
-
-    font-weight:
-        bold;
-
-    cursor:
-        pointer;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    transition:
-        transform .15s ease,
-        opacity .15s ease;
-}
-
-
-button:active {
-
-    transform:
-        scale(.98);
-}
-
-
-button:disabled {
-
-    opacity:
-        .5;
-
-    cursor:
-        default;
-
-    transform:
-        none;
-}
-
-
-.message {
-
-    text-align:
-        center;
-
-    min-height:
-        22px;
-
-    margin-top:
-        12px;
-
-    color:
-        #ff7777;
-
-    font-size:
-        14px;
-}
-
-
-.result {
-
-    margin-top:
-        20px;
-
-    background:
-        #090e16;
-
-    border:
-        1px solid #252d3a;
-
-    border-radius:
-        18px;
-
-    padding:
-        18px;
-
-    animation:
-        resultIn .25s ease;
-}
-
-
-@keyframes resultIn {
+@keyframes pageIn {
 
     from {
-
-        opacity:
-            0;
-
-        transform:
-            translateY(8px);
+        opacity: 0;
+        transform: translateY(20px) scale(.97);
     }
 
     to {
-
-        opacity:
-            1;
-
-        transform:
-            translateY(0);
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
 
-.item {
+.card {
+    position: relative;
 
-    display:
-        flex;
+    width: 100%;
 
-    justify-content:
-        space-between;
+    padding: 28px;
 
-    align-items:
-        center;
+    border-radius: var(--radius-xl);
 
-    gap:
-        15px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.105),
+            rgba(255,255,255,.045)
+        );
 
-    padding:
-        13px 0;
+    border: 1px solid var(--glass-border);
 
-    border-bottom:
-        1px solid #202733;
+    box-shadow: var(--shadow);
+
+    backdrop-filter:
+        blur(35px)
+        saturate(160%);
+
+    -webkit-backdrop-filter:
+        blur(35px)
+        saturate(160%);
+
+    overflow: hidden;
 }
 
+/* glass highlight */
 
-.item:last-of-type {
+.card::before {
+    content: "";
 
-    border-bottom:
-        0;
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.35),
+            transparent
+        );
+
+    opacity: .8;
 }
 
+/* =========================================================
+   TITLE
+   ========================================================= */
 
-.item span {
+.card h2 {
+    position: relative;
 
-    color:
-        #8994a5;
+    text-align: center;
 
-    font-size:
-        14px;
+    margin-bottom: 26px;
+
+    color: #fff;
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    letter-spacing: -.6px;
+
+    text-shadow:
+        0 2px 15px rgba(255,255,255,.10);
 }
 
+.card h2::after {
+    content: "";
 
-.item strong {
+    display: block;
 
-    color:
-        #fff;
+    width: 42px;
+    height: 4px;
 
-    font-size:
-        14px;
+    margin: 12px auto 0;
 
-    text-align:
-        left;
+    border-radius: 10px;
 
-    word-break:
-        break-word;
+    background:
+        linear-gradient(
+            90deg,
+            #ff453a,
+            #ff6961
+        );
+
+    box-shadow:
+        0 0 18px rgba(255,69,58,.35);
 }
 
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+input,
+select {
+    width: 100%;
+
+    height: 56px;
+
+    margin-bottom: 14px;
+
+    padding: 0 18px;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,.09);
+
+    outline: none;
+
+    background:
+        rgba(255,255,255,.065);
+
+    color: #fff;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+    text-align: center;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 8px 25px rgba(0,0,0,.12);
+
+    transition:
+        border-color .25s ease,
+        background .25s ease,
+        box-shadow .25s ease,
+        transform .2s ease;
+
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input::placeholder {
+    color: rgba(235,235,245,.38);
+}
+
+input:focus,
+select:focus {
+    background:
+        rgba(255,255,255,.095);
+
+    border-color:
+        rgba(255,69,58,.65);
+
+    box-shadow:
+        0 0 0 4px rgba(255,69,58,.10),
+        inset 0 1px 0 rgba(255,255,255,.07),
+        0 10px 30px rgba(0,0,0,.20);
+
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   SELECT
+   ========================================================= */
 
 select {
+    margin-top: 18px;
 
-    margin-top:
-        18px;
+    padding-left: 45px;
 
-    margin-bottom:
-        14px;
-
-    appearance:
-        none;
-
-    -webkit-appearance:
-        none;
+    cursor: pointer;
 
     background-image:
-
         linear-gradient(
             45deg,
             transparent 50%,
-            #8994a5 50%
+            rgba(255,255,255,.65) 50%
         ),
-
         linear-gradient(
             135deg,
-            #8994a5 50%,
+            rgba(255,255,255,.65) 50%,
             transparent 50%
         );
 
     background-position:
-
-        calc(100% - 20px) 22px,
-
-        calc(100% - 14px) 22px;
+        calc(100% - 22px) 24px,
+        calc(100% - 16px) 24px;
 
     background-size:
-
         6px 6px,
-
         6px 6px;
 
-    background-repeat:
-        no-repeat;
+    background-repeat: no-repeat;
 }
 
+select option {
+    background: #15171c;
+    color: #fff;
+}
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+button {
+    position: relative;
+
+    width: 100%;
+    height: 56px;
+
+    border: 0;
+    outline: none;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff453a,
+            #d71920
+        );
+
+    color: #fff;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    letter-spacing: -.2px;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 12px 30px rgba(255,69,58,.22),
+        inset 0 1px 0 rgba(255,255,255,.20);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        opacity .18s ease;
+}
+
+button::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -100%;
+
+    width: 70%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.18),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    transition: left .55s ease;
+}
+
+button:hover::before {
+    left: 140%;
+}
+
+button:hover {
+    box-shadow:
+        0 16px 38px rgba(255,69,58,.28),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+button:active {
+    transform: scale(.965);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.message {
+    min-height: 22px;
+
+    margin-top: 13px;
+
+    text-align: center;
+
+    color: rgba(255,255,255,.58);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    animation: messageIn .25s ease;
+}
+
+@keyframes messageIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
+.result {
+    position: relative;
+
+    margin-top: 20px;
+
+    padding: 8px 18px 18px;
+
+    border-radius: 24px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.09);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.045),
+        0 15px 40px rgba(0,0,0,.18);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
+
+    animation:
+        resultIn .38s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes resultIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   RESULT ITEMS
+   ========================================================= */
+
+.item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 18px;
+
+    min-height: 52px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.065);
+}
+
+.item:last-of-type {
+    border-bottom: 0;
+}
+
+.item span {
+    color:
+        rgba(235,235,245,.48);
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.item strong {
+    color: #fff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    word-break: break-word;
+}
+
+/* =========================================================
+   HIDDEN
+   ========================================================= */
 
 .hidden {
-
-    display:
-        none !important;
+    display: none !important;
 }
 
-
-/* ==========================================
-   IOS GLASS DIALOG
-========================================== */
+/* =========================================================
+   IOS SUCCESS / ERROR DIALOG
+   ========================================================= */
 
 #iosSuccessDialog,
 #iosErrorDialog {
+    position: fixed !important;
 
-    position:
-        fixed !important;
+    inset: 0 !important;
 
-    inset:
-        0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
 
-    width:
-        100vw !important;
-
-    height:
-        100vh !important;
-
-    margin:
-        0 !important;
+    margin: 0 !important;
 
     padding:
-        20px !important;
+        max(18px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(18px, env(safe-area-inset-left)) !important;
 
-    z-index:
-        999999 !important;
+    z-index: 999999 !important;
 
-    display:
-        flex !important;
+    display: flex !important;
 
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     background:
-        rgba(
-            0,
-            0,
-            0,
-            .38
-        ) !important;
+        rgba(0,0,0,.42) !important;
 
     backdrop-filter:
-        blur(18px)
-        saturate(150%);
+        blur(24px)
+        saturate(150%) !important;
 
     -webkit-backdrop-filter:
-        blur(18px)
-        saturate(150%);
+        blur(24px)
+        saturate(150%) !important;
 
-    opacity:
-        0;
+    opacity: 0;
 
-    visibility:
-        hidden;
+    visibility: hidden;
 
-    pointer-events:
-        none;
+    pointer-events: none;
 
     transition:
-        opacity .25s ease,
-        visibility .25s ease;
+        opacity .28s ease,
+        visibility .28s ease;
 }
-
 
 #iosSuccessDialog.show,
 #iosErrorDialog.show {
+    opacity: 1;
 
-    opacity:
-        1;
+    visibility: visible;
 
-    visibility:
-        visible;
-
-    pointer-events:
-        auto;
+    pointer-events: auto;
 }
 
-
-/* ==========================================
-   GLASS BOX
-========================================== */
+/* =========================================================
+   DIALOG BOX
+   ========================================================= */
 
 #iosSuccessDialog .ios-dialog,
 #iosErrorDialog .ios-dialog {
+    position: relative;
 
-    width:
-        100% !important;
+    width: 100% !important;
 
-    max-width:
-        350px !important;
-
-    margin:
-        0 !important;
+    max-width: 365px !important;
 
     padding:
-        28px 20px 20px !important;
+        30px
+        22px
+        22px !important;
 
-    border-radius:
-        30px !important;
+    border-radius: 32px !important;
 
     background:
-
         linear-gradient(
             145deg,
-            rgba(
-                255,
-                255,
-                255,
-                .16
-            ),
-            rgba(
-                255,
-                255,
-                255,
-                .07
-            )
+            rgba(255,255,255,.15),
+            rgba(255,255,255,.055)
         ) !important;
 
     border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .18
-        ) !important;
+        1px solid rgba(255,255,255,.16) !important;
 
     box-shadow:
-
-        0 30px 80px
-        rgba(
-            0,
-            0,
-            0,
-            .55
-        ),
-
-        inset 0 1px 0
-        rgba(
-            255,
-            255,
-            255,
-            .18
-        ),
-
-        inset 0 -1px 0
-        rgba(
-            255,
-            255,
-            255,
-            .04
-        ) !important;
+        0 35px 100px rgba(0,0,0,.65),
+        0 10px 35px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(255,255,255,.035) !important;
 
     backdrop-filter:
-        blur(35px)
-        saturate(160%);
+        blur(40px)
+        saturate(170%) !important;
 
     -webkit-backdrop-filter:
-        blur(35px)
-        saturate(160%);
+        blur(40px)
+        saturate(170%) !important;
 
-    text-align:
-        center !important;
+    text-align: center !important;
 
     transform:
-        translateY(15px)
-        scale(.94);
+        translateY(25px)
+        scale(.92);
+
+    opacity: .5;
 
     transition:
-        transform .32s
-        cubic-bezier(
-            .2,
-            .8,
-            .2,
-            1
-        );
+        transform .4s cubic-bezier(.2,.8,.2,1),
+        opacity .3s ease;
 }
-
 
 #iosSuccessDialog.show .ios-dialog,
 #iosErrorDialog.show .ios-dialog {
-
     transform:
         translateY(0)
         scale(1);
+
+    opacity: 1;
 }
 
+/* =========================================================
+   DIALOG TOP LIGHT
+   ========================================================= */
 
-/* ==========================================
-   SUCCESS ICON
-========================================== */
+#iosSuccessDialog .ios-dialog::before,
+#iosErrorDialog .ios-dialog::before {
+    content: "";
 
-#iosSuccessDialog
-.ios-success-icon {
+    position: absolute;
 
-    width:
-        72px !important;
+    top: 0;
+    left: 15%;
 
-    height:
-        72px !important;
-
-    margin:
-        0 auto 18px !important;
-
-    border-radius:
-        50% !important;
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
+    width: 70%;
+    height: 1px;
 
     background:
-        rgba(
-            52,
-            211,
-            153,
-            .18
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            52,
-            211,
-            153,
-            .35
-        ) !important;
-
-    box-shadow:
-
-        0 0 0 8px
-        rgba(
-            52,
-            211,
-            153,
-            .05
-        ),
-
-        0 12px 35px
-        rgba(
-            52,
-            211,
-            153,
-            .22
-        ) !important;
-
-    backdrop-filter:
-        blur(10px);
-
-    -webkit-backdrop-filter:
-        blur(10px);
-
-    animation:
-        successPop .45s
-        cubic-bezier(
-            .2,
-            .8,
-            .2,
-            1
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.42),
+            transparent
         );
 }
 
+/* =========================================================
+   SUCCESS ICON
+   ========================================================= */
 
-#iosSuccessDialog
-.ios-success-icon span {
+#iosSuccessDialog .ios-success-icon {
+    width: 76px !important;
+    height: 76px !important;
 
+    margin: 0 auto 18px !important;
+
+    border-radius: 50% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background:
+        rgba(48,209,88,.14) !important;
+
+    border:
+        1px solid rgba(48,209,88,.32) !important;
+
+    box-shadow:
+        0 0 0 9px rgba(48,209,88,.045),
+        0 12px 40px rgba(48,209,88,.20),
+        inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+    animation:
+        successPop .5s cubic-bezier(.2,.8,.2,1);
+}
+
+#iosSuccessDialog .ios-success-icon span {
     color:
-        #34d399 !important;
+        #30d158 !important;
 
     font-size:
-        42px !important;
+        43px !important;
 
     font-weight:
         700 !important;
@@ -662,89 +813,61 @@ select {
         1 !important;
 
     text-shadow:
-        0 0 18px
-        rgba(
-            52,
-            211,
-            153,
-            .45
-        );
+        0 0 20px rgba(48,209,88,.45);
 }
 
+@keyframes successPop {
 
-/* ==========================================
+    0% {
+        opacity: 0;
+        transform: scale(.55) rotate(-12deg);
+    }
+
+    65% {
+        opacity: 1;
+        transform: scale(1.08) rotate(2deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* =========================================================
    ERROR ICON
-========================================== */
+   ========================================================= */
 
-#iosErrorDialog
-.ios-error-icon {
+#iosErrorDialog .ios-error-icon {
+    width: 76px !important;
+    height: 76px !important;
 
-    width:
-        72px !important;
+    margin: 0 auto 18px !important;
 
-    height:
-        72px !important;
+    border-radius: 50% !important;
 
-    margin:
-        0 auto 18px !important;
+    display: flex !important;
 
-    border-radius:
-        50% !important;
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     background:
-        rgba(
-            255,
-            70,
-            70,
-            .13
-        ) !important;
+        rgba(255,69,58,.12) !important;
 
     border:
-        1px solid
-        rgba(
-            255,
-            80,
-            80,
-            .30
-        ) !important;
+        1px solid rgba(255,69,58,.30) !important;
 
     box-shadow:
-
-        0 0 0 8px
-        rgba(
-            255,
-            70,
-            70,
-            .04
-        ),
-
-        0 12px 35px
-        rgba(
-            215,
-            25,
-            32,
-            .20
-        ) !important;
+        0 0 0 9px rgba(255,69,58,.035),
+        0 12px 40px rgba(255,69,58,.18),
+        inset 0 1px 0 rgba(255,255,255,.10) !important;
 }
 
-
-#iosErrorDialog
-.ios-error-icon span {
-
+#iosErrorDialog .ios-error-icon span {
     color:
-        #ff5c5c !important;
+        #ff453a !important;
 
     font-size:
-        38px !important;
+        39px !important;
 
     font-weight:
         700 !important;
@@ -753,49 +876,12 @@ select {
         1 !important;
 }
 
+/* =========================================================
+   DIALOG TITLE
+   ========================================================= */
 
-/* ==========================================
-   SUCCESS ANIMATION
-========================================== */
-
-@keyframes successPop {
-
-    0% {
-
-        opacity:
-            0;
-
-        transform:
-            scale(.65);
-    }
-
-    70% {
-
-        transform:
-            scale(1.08);
-    }
-
-    100% {
-
-        opacity:
-            1;
-
-        transform:
-            scale(1);
-    }
-}
-
-
-/* ==========================================
-   TITLE
-========================================== */
-
-#iosSuccessDialog
-.ios-dialog-title,
-
-#iosErrorDialog
-.ios-dialog-title {
-
+#iosSuccessDialog .ios-dialog-title,
+#iosErrorDialog .ios-dialog-title {
     margin:
         0 0 7px 0 !important;
 
@@ -803,7 +889,7 @@ select {
         #fff !important;
 
     font-size:
-        21px !important;
+        22px !important;
 
     font-weight:
         700 !important;
@@ -812,152 +898,89 @@ select {
         1.35 !important;
 
     letter-spacing:
-        -.2px;
+        -.5px;
 }
 
+/* =========================================================
+   DIALOG MESSAGE
+   ========================================================= */
 
-/* ==========================================
-   MESSAGE
-========================================== */
-
-#iosSuccessDialog
-.ios-dialog-message,
-
-#iosErrorDialog
-.ios-dialog-message {
-
+#iosSuccessDialog .ios-dialog-message,
+#iosErrorDialog .ios-dialog-message {
     margin:
         0 0 20px 0 !important;
 
     color:
-        rgba(
-            255,
-            255,
-            255,
-            .65
-        ) !important;
+        rgba(235,235,245,.60) !important;
 
     font-size:
         14px !important;
 
     line-height:
-        1.65 !important;
+        1.7 !important;
 }
 
+/* =========================================================
+   SUCCESS INFO
+   ========================================================= */
 
-/* ==========================================
-   SUCCESS INFO BOX
-========================================== */
-
-#iosSuccessDialog
-.ios-info {
-
-    width:
-        100% !important;
+#iosSuccessDialog .ios-info {
+    width: 100% !important;
 
     margin:
         0 0 18px 0 !important;
 
-    overflow:
-        hidden !important;
+    overflow: hidden !important;
 
     border-radius:
-        19px !important;
+        21px !important;
 
     background:
-        rgba(
-            255,
-            255,
-            255,
-            .055
-        ) !important;
+        rgba(0,0,0,.16) !important;
 
     border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .08
-        ) !important;
+        1px solid rgba(255,255,255,.08) !important;
 
     box-shadow:
-        inset 0 1px 0
-        rgba(
-            255,
-            255,
-            255,
-            .05
-        );
+        inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
 
+#iosSuccessDialog .ios-row {
+    width: 100% !important;
 
-/* ==========================================
-   INFO ROW
-========================================== */
+    min-height: 52px !important;
 
-#iosSuccessDialog
-.ios-row {
+    display: flex !important;
 
-    width:
-        100% !important;
+    align-items: center !important;
 
-    min-height:
-        49px !important;
+    justify-content: space-between !important;
 
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        space-between !important;
-
-    gap:
-        15px !important;
+    gap: 15px !important;
 
     padding:
-        0 15px !important;
+        0 16px !important;
 
     border-bottom:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .055
-        ) !important;
+        1px solid rgba(255,255,255,.055) !important;
 }
 
-
-#iosSuccessDialog
-.ios-row:last-child {
-
-    border-bottom:
-        0 !important;
+#iosSuccessDialog .ios-row:last-child {
+    border-bottom: 0 !important;
 }
 
-
-#iosSuccessDialog
-.ios-row span {
-
+#iosSuccessDialog .ios-row span {
     color:
-        rgba(
-            255,
-            255,
-            255,
-            .48
-        ) !important;
+        rgba(235,235,245,.45) !important;
 
     font-size:
         13px !important;
+
+    font-weight:
+        500 !important;
 }
 
-
-#iosSuccessDialog
-.ios-row strong {
-
+#iosSuccessDialog .ios-row strong {
     color:
         #fff !important;
 
@@ -971,51 +994,30 @@ select {
         left !important;
 }
 
+/* =========================================================
+   IOS OK BUTTON
+   ========================================================= */
 
-/* ==========================================
-   OK BUTTON
-========================================== */
+#iosSuccessDialog button.ios-ok,
+#iosErrorDialog button.ios-ok {
+    display: block !important;
 
-#iosSuccessDialog
-button.ios-ok,
+    width: 100% !important;
 
-#iosErrorDialog
-button.ios-ok {
+    height: 52px !important;
 
-    display:
-        block !important;
+    margin: 0 !important;
 
-    width:
-        100% !important;
-
-    height:
-        50px !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
+    padding: 0 !important;
 
     border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .12
-        ) !important;
+        1px solid rgba(255,255,255,.11) !important;
 
     border-radius:
-        16px !important;
+        18px !important;
 
     background:
-        rgba(
-            255,
-            255,
-            255,
-            .10
-        ) !important;
+        rgba(255,255,255,.085) !important;
 
     color:
         #fff !important;
@@ -1033,120 +1035,136 @@ button.ios-ok {
         none !important;
 
     backdrop-filter:
-        blur(10px);
+        blur(15px) !important;
 
     -webkit-backdrop-filter:
-        blur(10px);
+        blur(15px) !important;
 
     box-shadow:
-        inset 0 1px 0
-        rgba(
-            255,
-            255,
-            255,
-            .12
-        );
+        inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+    transition:
+        transform .15s ease,
+        background .15s ease !important;
 }
 
-
-#iosSuccessDialog
-button.ios-ok {
-
+#iosSuccessDialog button.ios-ok {
     color:
-        #34d399 !important;
+        #30d158 !important;
 }
 
-
-#iosErrorDialog
-button.ios-ok {
-
+#iosErrorDialog button.ios-ok {
     color:
-        #ff6868 !important;
+        #ff453a !important;
 }
 
-
-#iosSuccessDialog
-button.ios-ok:active,
-
-#iosErrorDialog
-button.ios-ok:active {
-
+#iosSuccessDialog button.ios-ok:active,
+#iosErrorDialog button.ios-ok:active {
     transform:
         scale(.96) !important;
 
-    opacity:
-        .75 !important;
+    background:
+        rgba(255,255,255,.14) !important;
 }
 
-
-/* ==========================================
+/* =========================================================
    MOBILE
-========================================== */
+   ========================================================= */
 
-@media (max-width: 430px) {
+@media (max-width: 480px) {
 
     body {
-
         padding:
-            15px;
+            max(14px, env(safe-area-inset-top))
+            max(14px, env(safe-area-inset-right))
+            max(14px, env(safe-area-inset-bottom))
+            max(14px, env(safe-area-inset-left));
     }
-
 
     .card {
+        padding: 22px 18px;
 
-        padding:
-            20px;
-
-        border-radius:
-            22px;
+        border-radius: 28px;
     }
 
+    .card h2 {
+        font-size: 23px;
 
-    #iosSuccessDialog,
-    #iosErrorDialog {
-
-        padding:
-            16px !important;
+        margin-bottom: 23px;
     }
 
+    input,
+    select,
+    button {
+        height: 54px;
+    }
 
-    #iosSuccessDialog
-    .ios-dialog,
-
-    #iosErrorDialog
-    .ios-dialog {
-
-        max-width:
-            100% !important;
-
-        border-radius:
-            28px !important;
+    .result {
+        border-radius: 21px;
 
         padding:
-            26px 18px 18px !important;
+            7px 15px 15px;
+    }
+
+    #iosSuccessDialog .ios-dialog,
+    #iosErrorDialog .ios-dialog {
+        max-width: 100% !important;
+
+        border-radius: 29px !important;
+
+        padding:
+            27px 18px 18px !important;
     }
 }
 
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
 
-/* ==========================================
-   REDUCED MOTION
-========================================== */
+@media (max-width: 360px) {
 
-@media (
-    prefers-reduced-motion: reduce
-) {
+    .card {
+        padding: 20px 15px;
+    }
+
+    .card h2 {
+        font-size: 21px;
+    }
+
+    .item {
+        gap: 10px;
+    }
+
+    .item span,
+    .item strong {
+        font-size: 13px;
+    }
+
+    #iosSuccessDialog .ios-dialog,
+    #iosErrorDialog .ios-dialog {
+        padding:
+            23px 15px 15px !important;
+    }
+
+    #iosSuccessDialog .ios-success-icon,
+    #iosErrorDialog .ios-error-icon {
+        width: 68px !important;
+        height: 68px !important;
+    }
+}
+
+/* =========================================================
+   REDUCE MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
 
     *,
     *::before,
     *::after {
-
-        animation-duration:
-            .01ms !important;
-
-        animation-iteration-count:
-            1 !important;
-
-        transition-duration:
-            .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
     }
 }
