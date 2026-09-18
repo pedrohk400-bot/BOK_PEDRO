@@ -73,6 +73,9 @@ body {
 
     margin-bottom:
         20px;
+
+    font-size:
+        23px;
 }
 
 
@@ -126,7 +129,12 @@ select:focus {
 
     box-shadow:
         0 0 0 3px
-        rgba(215, 25, 32, .12);
+        rgba(
+            215,
+            25,
+            32,
+            .12
+        );
 }
 
 
@@ -413,7 +421,12 @@ select {
         center !important;
 
     background:
-        rgba(0, 0, 0, .58) !important;
+        rgba(
+            0,
+            0,
+            0,
+            .58
+        ) !important;
 
     backdrop-filter:
         blur(20px);
@@ -473,19 +486,39 @@ select {
         28px !important;
 
     background:
-        rgba(24, 30, 42, .97) !important;
+        rgba(
+            24,
+            30,
+            42,
+            .97
+        ) !important;
 
     border:
         1px solid
-        rgba(255, 255, 255, .10) !important;
+        rgba(
+            255,
+            255,
+            255,
+            .10
+        ) !important;
 
     box-shadow:
 
         0 25px 80px
-        rgba(0, 0, 0, .60),
+        rgba(
+            0,
+            0,
+            0,
+            .60
+        ),
 
         inset 0 1px 0
-        rgba(255, 255, 255, .07) !important;
+        rgba(
+            255,
+            255,
+            255,
+            .07
+        ) !important;
 
     text-align:
         center !important;
@@ -495,7 +528,12 @@ select {
 
     transition:
         transform .28s
-        cubic-bezier(.2, .8, .2, 1);
+        cubic-bezier(
+            .2,
+            .8,
+            .2,
+            1
+        );
 }
 
 
@@ -511,7 +549,8 @@ select {
    SUCCESS ICON
 ========================================== */
 
-#iosSuccessDialog .ios-success-icon {
+#iosSuccessDialog
+.ios-success-icon {
 
     width:
         76px !important;
@@ -539,7 +578,12 @@ select {
 
     box-shadow:
         0 10px 35px
-        rgba(25, 195, 125, .30) !important;
+        rgba(
+            25,
+            195,
+            125,
+            .30
+        ) !important;
 }
 
 
@@ -564,7 +608,8 @@ select {
    ERROR ICON
 ========================================== */
 
-#iosErrorDialog .ios-error-icon {
+#iosErrorDialog
+.ios-error-icon {
 
     width:
         76px !important;
@@ -592,7 +637,12 @@ select {
 
     box-shadow:
         0 10px 35px
-        rgba(215, 25, 32, .30) !important;
+        rgba(
+            215,
+            25,
+            32,
+            .30
+        ) !important;
 }
 
 
@@ -614,11 +664,14 @@ select {
 
 
 /* ==========================================
-   DIALOG TITLE
+   TITLE
 ========================================== */
 
-#iosSuccessDialog .ios-dialog-title,
-#iosErrorDialog .ios-dialog-title {
+#iosSuccessDialog
+.ios-dialog-title,
+
+#iosErrorDialog
+.ios-dialog-title {
 
     margin:
         0 0 8px 0 !important;
@@ -638,11 +691,14 @@ select {
 
 
 /* ==========================================
-   DIALOG MESSAGE
+   MESSAGE
 ========================================== */
 
-#iosSuccessDialog .ios-dialog-message,
-#iosErrorDialog .ios-dialog-message {
+#iosSuccessDialog
+.ios-dialog-message,
+
+#iosErrorDialog
+.ios-dialog-message {
 
     margin:
         0 0 20px 0 !important;
@@ -659,10 +715,11 @@ select {
 
 
 /* ==========================================
-   SUCCESS INFORMATION
+   INFO
 ========================================== */
 
-#iosSuccessDialog .ios-info {
+#iosSuccessDialog
+.ios-info {
 
     width:
         100% !important;
@@ -677,15 +734,26 @@ select {
         18px !important;
 
     background:
-        rgba(255, 255, 255, .045) !important;
+        rgba(
+            255,
+            255,
+            255,
+            .045
+        ) !important;
 
     border:
         1px solid
-        rgba(255, 255, 255, .06) !important;
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        ) !important;
 }
 
 
-#iosSuccessDialog .ios-row {
+#iosSuccessDialog
+.ios-row {
 
     width:
         100% !important;
@@ -710,18 +778,25 @@ select {
 
     border-bottom:
         1px solid
-        rgba(255, 255, 255, .06) !important;
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        ) !important;
 }
 
 
-#iosSuccessDialog .ios-row:last-child {
+#iosSuccessDialog
+.ios-row:last-child {
 
     border-bottom:
         0 !important;
 }
 
 
-#iosSuccessDialog .ios-row span {
+#iosSuccessDialog
+.ios-row span {
 
     color:
         #8994a5 !important;
@@ -731,7 +806,8 @@ select {
 }
 
 
-#iosSuccessDialog .ios-row strong {
+#iosSuccessDialog
+.ios-row strong {
 
     color:
         #fff !important;
@@ -751,8 +827,11 @@ select {
    OK BUTTON
 ========================================== */
 
-#iosSuccessDialog button.ios-ok,
-#iosErrorDialog button.ios-ok {
+#iosSuccessDialog
+button.ios-ok,
+
+#iosErrorDialog
+button.ios-ok {
 
     display:
         block !important;
@@ -795,8 +874,11 @@ select {
 }
 
 
-#iosSuccessDialog button.ios-ok:active,
-#iosErrorDialog button.ios-ok:active {
+#iosSuccessDialog
+button.ios-ok:active,
+
+#iosErrorDialog
+button.ios-ok:active {
 
     transform:
         scale(.97);
@@ -829,8 +911,11 @@ select {
     }
 
 
-    #iosSuccessDialog .ios-dialog,
-    #iosErrorDialog .ios-dialog {
+    #iosSuccessDialog
+    .ios-dialog,
+
+    #iosErrorDialog
+    .ios-dialog {
 
         max-width:
             100%;
@@ -845,7 +930,9 @@ select {
    REDUCED MOTION
 ========================================== */
 
-@media (prefers-reduced-motion: reduce) {
+@media (
+    prefers-reduced-motion: reduce
+) {
 
     *,
     *::before,
