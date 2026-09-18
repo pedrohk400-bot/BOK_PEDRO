@@ -3,6 +3,11 @@
 // البحث عن الحساب + تجديد الاشتراك
 // ==================================================
 
+
+// ==================================================
+// عناصر الصفحة
+// ==================================================
+
 const searchBtn =
     document.getElementById("searchBtn");
 
@@ -26,6 +31,15 @@ const resultBox =
 let currentAccount = null;
 let currentUid = null;
 let firebaseReady = false;
+
+
+// ==================================================
+// حماية تسجيل الدخول من التكرار
+// ==================================================
+
+let loginInProgress = false;
+
+let lastLoginAttempt = 0;
 
 
 // ==================================================
@@ -82,9 +96,65 @@ function setMessage(message) {
 
 // ==================================================
 // تسجيل الدخول إلى Firebase
+// منع التكرار والمحاولات السريعة
 // ==================================================
 
 async function loginToFirebase() {
+
+    // ----------------------------------------------
+    // يوجد تسجيل دخول قيد التنفيذ
+    // ----------------------------------------------
+
+    if (loginInProgress) {
+
+        return false;
+    }
+
+
+    // ----------------------------------------------
+    // إذا كانت الجلسة الحالية صحيحة
+    // ----------------------------------------------
+
+    if (
+        auth.currentUser &&
+        auth.currentUser.uid === WEBSITE_UID
+    ) {
+
+        firebaseReady = true;
+
+        setMessage("");
+
+        return true;
+    }
+
+
+    // ----------------------------------------------
+    // منع المحاولات المتكررة بسرعة
+    // ----------------------------------------------
+
+    const now =
+        Date.now();
+
+
+    if (
+        now - lastLoginAttempt < 30000
+    ) {
+
+        setMessage(
+            "يرجى الانتظار قليلًا قبل إعادة الاتصال."
+        );
+
+        return false;
+    }
+
+
+    lastLoginAttempt =
+        now;
+
+
+    loginInProgress =
+        true;
+
 
     try {
 
@@ -93,28 +163,23 @@ async function loginToFirebase() {
         );
 
 
-        // إذا كان مسجل بالفعل
-        if (auth.currentUser) {
+        // ------------------------------------------
+        // إذا كان هناك حساب آخر مسجل
+        // ------------------------------------------
 
-            if (
-                auth.currentUser.uid ===
-                WEBSITE_UID
-            ) {
-
-                firebaseReady =
-                    true;
-
-                setMessage("");
-
-                return true;
-            }
-
+        if (
+            auth.currentUser &&
+            auth.currentUser.uid !== WEBSITE_UID
+        ) {
 
             await auth.signOut();
         }
 
 
+        // ------------------------------------------
         // تسجيل الدخول
+        // ------------------------------------------
+
         const result =
             await auth.signInWithEmailAndPassword(
                 WEBSITE_EMAIL,
@@ -122,27 +187,38 @@ async function loginToFirebase() {
             );
 
 
+        // ------------------------------------------
         // التأكد من UID
+        // ------------------------------------------
+
         if (
-            result.user.uid !==
-            WEBSITE_UID
+            !result.user ||
+            result.user.uid !== WEBSITE_UID
         ) {
 
             firebaseReady =
                 false;
 
+
             await auth.signOut();
+
 
             setMessage(
                 "حساب الموقع غير صحيح"
             );
 
+
             return false;
         }
 
 
+        // ------------------------------------------
+        // نجاح تسجيل الدخول
+        // ------------------------------------------
+
         firebaseReady =
             true;
+
 
         setMessage("");
 
@@ -153,7 +229,7 @@ async function loginToFirebase() {
 
 
         console.log(
-            "UID:",
+            "Firebase UID:",
             result.user.uid
         );
 
@@ -173,7 +249,25 @@ async function loginToFirebase() {
         );
 
 
+        // ------------------------------------------
+        // كثرة المحاولات
+        // ------------------------------------------
+
         if (
+            error.code ===
+            "auth/too-many-requests"
+        ) {
+
+            setMessage(
+                "تم إيقاف محاولات تسجيل الدخول مؤقتًا من Firebase. انتظر قليلًا ثم حاول مرة واحدة."
+            );
+
+
+        // ------------------------------------------
+        // بيانات الدخول
+        // ------------------------------------------
+
+        } else if (
             error.code ===
             "auth/invalid-credential"
         ) {
@@ -233,16 +327,6 @@ async function loginToFirebase() {
             );
 
 
-        } else if (
-            error.code ===
-            "auth/too-many-requests"
-        ) {
-
-            setMessage(
-                "محاولات كثيرة. انتظر قليلًا ثم حاول مرة أخرى."
-            );
-
-
         } else {
 
             setMessage(
@@ -257,6 +341,12 @@ async function loginToFirebase() {
 
 
         return false;
+
+
+    } finally {
+
+        loginInProgress =
+            false;
     }
 }
 
@@ -324,7 +414,7 @@ function showDialog(
 
 
     // ==================================================
-    // نجاح
+    // Dialog النجاح
     // ==================================================
 
     if (
@@ -410,7 +500,7 @@ function showDialog(
     } else {
 
         // ==================================================
-        // خطأ
+        // Dialog الخطأ
         // ==================================================
 
         dialog =
@@ -590,12 +680,13 @@ if (searchBtn) {
 
 
             // ==================================================
-            // تسجيل الدخول
+            // التأكد من Firebase
             // ==================================================
 
             if (
                 !firebaseReady ||
-                !auth.currentUser
+                !auth.currentUser ||
+                auth.currentUser.uid !== WEBSITE_UID
             ) {
 
                 searchBtn.disabled =
@@ -1486,6 +1577,6 @@ auth.onAuthStateChanged(
 
 
 // ==================================================
-// مهم:
+// مهم جدًا:
 // لا نضع loginToFirebase() هنا
 // ==================================================
