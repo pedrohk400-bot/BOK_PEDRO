@@ -1,34 +1,87 @@
-// ==========================================
-// BOK-PED
-// البحث المباشر من Firebase
-// لا يوجد Backend
-// ==========================================
-
-
-const searchBtn =
-    document.getElementById("searchBtn");
-
-const renewBtn =
-    document.getElementById("renewBtn");
-
-const accountInput =
-    document.getElementById("account");
-
-const msg =
-    document.getElementById("msg");
-
-const resultBox =
-    document.getElementById("result");
-
+const searchBtn = document.getElementById("searchBtn");
+const renewBtn = document.getElementById("renewBtn");
+const accountInput = document.getElementById("account");
+const msg = document.getElementById("msg");
+const resultBox = document.getElementById("result");
 
 let currentAccount = null;
-
 let currentUid = null;
+let firebaseReady = false;
 
 
-// ==========================================
+// ========================================
+// حساب Firebase المخصص للموقع
+// ========================================
+
+const WEBSITE_EMAIL = "website-reader@bok-ped.com";
+const WEBSITE_PASSWORD = "Pedro@123@";
+
+
+// ========================================
+// تسجيل الدخول إلى Firebase
+// ========================================
+
+async function loginToFirebase() {
+
+    try {
+
+        setMessage("جاري الاتصال...");
+
+        await auth.signInWithEmailAndPassword(
+            WEBSITE_EMAIL,
+            WEBSITE_PASSWORD
+        );
+
+        firebaseReady = true;
+
+        setMessage("");
+
+        console.log("Firebase authentication successful");
+
+    } catch (error) {
+
+        firebaseReady = false;
+
+        console.error(
+            "Firebase authentication error:",
+            error
+        );
+
+        if (error.code === "auth/invalid-credential") {
+
+            setMessage("بيانات دخول الموقع غير صحيحة");
+
+        } else if (error.code === "auth/invalid-email") {
+
+            setMessage("إيميل حساب الموقع غير صحيح");
+
+        } else if (error.code === "auth/network-request-failed") {
+
+            setMessage("تحقق من اتصال الإنترنت");
+
+        } else {
+
+            setMessage("تعذر الاتصال بـ Firebase");
+        }
+    }
+}
+
+
+// ========================================
+// الرسائل
+// ========================================
+
+function setMessage(message) {
+
+    if (msg) {
+        msg.textContent = message || "";
+    }
+}
+
+
+// ========================================
 // تنسيق التاريخ
-// ==========================================
+// ========================================
 
 function formatDate(value) {
 
@@ -38,45 +91,28 @@ function formatDate(value) {
         value === "" ||
         Number(value) === 0
     ) {
-
         return "-";
-
     }
 
+    const date = new Date(Number(value));
 
-    const date =
-        new Date(
-            Number(value)
-        );
-
-
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-
+    if (isNaN(date.getTime())) {
         return "-";
-
     }
 
-
-    return date.toLocaleString(
-        "ar",
-        {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit"
-        }
-    );
+    return date.toLocaleString("ar", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+    });
 }
 
 
-// ==========================================
-// إظهار Dialog
-// ==========================================
+// ========================================
+// Dialog
+// ========================================
 
 function showDialog(
     type,
@@ -89,69 +125,91 @@ function showDialog(
 
     let dialog;
 
-
     if (type === "success") {
 
-        dialog =
-            document.getElementById(
-                "iosSuccessDialog"
-            );
+        dialog = document.getElementById(
+            "iosSuccessDialog"
+        );
 
-        document.getElementById(
-            "successMessage"
-        ).textContent =
-            message || "";
+        const successTitle =
+            document.getElementById("successTitle");
 
+        const successMessage =
+            document.getElementById("successMessage");
 
-        document.getElementById(
-            "successAccount"
-        ).textContent =
-            accountNumber || "-";
+        const successAccount =
+            document.getElementById("successAccount");
 
+        const successSubscription =
+            document.getElementById("successSubscription");
 
-        document.getElementById(
-            "successSubscription"
-        ).textContent =
-            subscriptionName || "-";
+        const successEnd =
+            document.getElementById("successEnd");
 
 
-        document.getElementById(
-            "successEnd"
-        ).textContent =
-            endDate || "-";
+        if (successTitle) {
+            successTitle.textContent =
+                title || "تمت العملية";
+        }
+
+        if (successMessage) {
+            successMessage.textContent =
+                message || "";
+        }
+
+        if (successAccount) {
+            successAccount.textContent =
+                accountNumber || "-";
+        }
+
+        if (successSubscription) {
+            successSubscription.textContent =
+                subscriptionName || "-";
+        }
+
+        if (successEnd) {
+            successEnd.textContent =
+                endDate || "-";
+        }
 
     } else {
 
-        dialog =
-            document.getElementById(
-                "iosErrorDialog"
-            );
+        dialog = document.getElementById(
+            "iosErrorDialog"
+        );
+
+        const errorTitle =
+            document.getElementById("errorTitle");
+
+        const errorMessage =
+            document.getElementById("errorMessage");
 
 
-        document.getElementById(
-            "errorMessage"
-        ).textContent =
-            message || "";
+        if (errorTitle) {
+            errorTitle.textContent =
+                title || "تنبيه";
+        }
 
+        if (errorMessage) {
+            errorMessage.textContent =
+                message || "";
+        }
     }
 
 
     if (!dialog) {
 
         alert(
-            title +
+            (title || "تنبيه") +
             "\n\n" +
-            message
+            (message || "")
         );
 
         return;
     }
 
 
-    dialog.classList.add(
-        "show"
-    );
-
+    dialog.classList.add("show");
 
     dialog.setAttribute(
         "aria-hidden",
@@ -160,27 +218,20 @@ function showDialog(
 }
 
 
-// ==========================================
+// ========================================
 // إغلاق Dialog
-// ==========================================
+// ========================================
 
 function closeDialog(id) {
 
     const dialog =
         document.getElementById(id);
 
-
     if (!dialog) {
-
         return;
-
     }
 
-
-    dialog.classList.remove(
-        "show"
-    );
-
+    dialog.classList.remove("show");
 
     dialog.setAttribute(
         "aria-hidden",
@@ -189,104 +240,240 @@ function closeDialog(id) {
 }
 
 
-// ==========================================
-// أزرار Dialog
-// ==========================================
-
 const successOk =
-    document.getElementById(
-        "successOk"
-    );
-
+    document.getElementById("successOk");
 
 const errorOk =
-    document.getElementById(
-        "errorOk"
-    );
+    document.getElementById("errorOk");
 
 
 if (successOk) {
 
-    successOk.onclick =
-        function () {
+    successOk.onclick = function() {
 
-            closeDialog(
-                "iosSuccessDialog"
-            );
-
-        };
-
+        closeDialog(
+            "iosSuccessDialog"
+        );
+    };
 }
 
 
 if (errorOk) {
 
-    errorOk.onclick =
-        function () {
+    errorOk.onclick = function() {
 
-            closeDialog(
-                "iosErrorDialog"
-            );
-
-        };
-
+        closeDialog(
+            "iosErrorDialog"
+        );
+    };
 }
 
 
-// ==========================================
+// ========================================
 // البحث عن الحساب
-// ==========================================
+// ========================================
 
-searchBtn.onclick =
-    async function () {
+searchBtn.onclick = async function() {
 
-
-        const number =
-            accountInput.value.trim();
+    const number =
+        accountInput.value.trim();
 
 
-        // ------------------------------
-        // التحقق من الرقم
-        // ------------------------------
+    // التأكد من تسجيل الدخول
+
+    if (
+        !firebaseReady ||
+        !auth.currentUser
+    ) {
+
+        setMessage(
+            "جاري الاتصال بـ Firebase..."
+        );
+
+        await loginToFirebase();
+
 
         if (
-            !/^[0-9]{7}$/.test(
-                number
-            )
+            !firebaseReady ||
+            !auth.currentUser
         ) {
-
-            msg.textContent =
-                "أدخل رقم حساب مكون من 7 أرقام";
-
-
-            resultBox.classList.add(
-                "hidden"
-            );
-
-
-            currentAccount = null;
-
-            currentUid = null;
-
 
             return;
         }
+    }
 
 
-        // ------------------------------
-        // حالة البحث
-        // ------------------------------
+    // التأكد أن الرقم 7 أرقام
 
-        searchBtn.disabled =
-            true;
+    if (!/^[0-9]{7}$/.test(number)) {
+
+        setMessage(
+            "أدخل رقم حساب مكون من 7 أرقام"
+        );
+
+        resultBox.classList.add(
+            "hidden"
+        );
+
+        currentAccount = null;
+        currentUid = null;
+
+        return;
+    }
 
 
-        searchBtn.textContent =
-            "جاري البحث...";
+    searchBtn.disabled = true;
+
+    searchBtn.textContent =
+        "جاري البحث...";
+
+    setMessage("");
+
+    resultBox.classList.add(
+        "hidden"
+    );
+
+    currentAccount = null;
+    currentUid = null;
 
 
-        msg.textContent =
-            "";
+    try {
+
+        // ====================================
+        // قراءة accountNumbers
+        // ====================================
+
+        const accountRef =
+            database.ref(
+                "accountNumbers/" + number
+            );
+
+
+        const accountSnapshot =
+            await accountRef.once("value");
+
+
+        if (!accountSnapshot.exists()) {
+
+            throw new Error(
+                "رقم الحساب غير موجود"
+            );
+        }
+
+
+        const accountData =
+            accountSnapshot.val();
+
+
+        if (
+            !accountData ||
+            !accountData.uid
+        ) {
+
+            throw new Error(
+                "الحساب غير مرتبط بمستخدم"
+            );
+        }
+
+
+        currentUid =
+            String(accountData.uid);
+
+        currentAccount =
+            number;
+
+
+        // ====================================
+        // قراءة users
+        // ====================================
+
+        const userRef =
+            database.ref(
+                "users/" + currentUid
+            );
+
+
+        const userSnapshot =
+            await userRef.once("value");
+
+
+        if (!userSnapshot.exists()) {
+
+            throw new Error(
+                "المستخدم غير موجود"
+            );
+        }
+
+
+        const user =
+            userSnapshot.val() || {};
+
+
+        // ====================================
+        // عرض البيانات
+        // ====================================
+
+        document.getElementById(
+            "rAccount"
+        ).textContent = number;
+
+
+        document.getElementById(
+            "rName"
+        ).textContent =
+            user.username || "-";
+
+
+        document.getElementById(
+            "rActive"
+        ).textContent =
+            user.active === true
+                ? "مفعل"
+                : "غير مفعل";
+
+
+        document.getElementById(
+            "rSub"
+        ).textContent =
+            user.subscriptionName || "-";
+
+
+        document.getElementById(
+            "rStart"
+        ).textContent =
+            formatDate(
+                user.subscriptionStart
+            );
+
+
+        document.getElementById(
+            "rEnd"
+        ).textContent =
+            formatDate(
+                user.subscriptionEnd
+            );
+
+
+        resultBox.classList.remove(
+            "hidden"
+        );
+
+
+        setMessage(
+            "تم العثور على الحساب"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Firebase search error:",
+            error
+        );
+
+
+        currentAccount = null;
+        currentUid = null;
 
 
         resultBox.classList.add(
@@ -294,285 +481,74 @@ searchBtn.onclick =
         );
 
 
-        try {
+        if (
+            error &&
+            error.message &&
+            error.message
+                .toLowerCase()
+                .includes("permission")
+        ) {
 
-
-            // ==================================
-            // قراءة:
-            // accountNumbers/{account}
-            // ==================================
-
-            const accountRef =
-                database.ref(
-                    "accountNumbers/" +
-                    number
-                );
-
-
-            const accountSnapshot =
-                await accountRef.once(
-                    "value"
-                );
-
-
-            if (
-                !accountSnapshot.exists()
-            ) {
-
-                throw new Error(
-                    "رقم الحساب غير موجود"
-                );
-
-            }
-
-
-            const accountData =
-                accountSnapshot.val();
-
-
-            // ==================================
-            // استخراج UID
-            // ==================================
-
-            if (
-                !accountData ||
-                !accountData.uid
-            ) {
-
-                throw new Error(
-                    "الحساب غير مرتبط بمستخدم"
-                );
-
-            }
-
-
-            currentUid =
-                String(
-                    accountData.uid
-                );
-
-
-            currentAccount =
-                number;
-
-
-            // ==================================
-            // قراءة:
-            // users/{uid}
-            // ==================================
-
-            const userRef =
-                database.ref(
-                    "users/" +
-                    currentUid
-                );
-
-
-            const userSnapshot =
-                await userRef.once(
-                    "value"
-                );
-
-
-            if (
-                !userSnapshot.exists()
-            ) {
-
-                throw new Error(
-                    "المستخدم غير موجود"
-                );
-
-            }
-
-
-            const user =
-                userSnapshot.val() || {};
-
-
-            // ==================================
-            // رقم الحساب
-            // ==================================
-
-            document.getElementById(
-                "rAccount"
-            ).textContent =
-                number;
-
-
-            // ==================================
-            // الاسم
-            // ==================================
-
-            document.getElementById(
-                "rName"
-            ).textContent =
-                user.username || "-";
-
-
-            // ==================================
-            // الحالة
-            // ==================================
-
-            document.getElementById(
-                "rActive"
-            ).textContent =
-                user.active === true
-                    ? "مفعل"
-                    : "غير مفعل";
-
-
-            // ==================================
-            // الاشتراك
-            // ==================================
-
-            document.getElementById(
-                "rSub"
-            ).textContent =
-                user.subscriptionName ||
-                "-";
-
-
-            // ==================================
-            // البداية
-            // ==================================
-
-            document.getElementById(
-                "rStart"
-            ).textContent =
-                formatDate(
-                    user.subscriptionStart
-                );
-
-
-            // ==================================
-            // النهاية
-            // ==================================
-
-            document.getElementById(
-                "rEnd"
-            ).textContent =
-                formatDate(
-                    user.subscriptionEnd
-                );
-
-
-            // ==================================
-            // إظهار النتيجة
-            // ==================================
-
-            resultBox.classList.remove(
-                "hidden"
+            setMessage(
+                "Firebase رفض قراءة البيانات"
             );
 
+        } else {
 
-            msg.textContent =
-                "تم العثور على الحساب";
-
-
-        } catch (error) {
-
-
-            console.error(
-                "Firebase search error:",
-                error
+            setMessage(
+                error.message ||
+                "حدث خطأ أثناء البحث"
             );
-
-
-            currentAccount = null;
-
-            currentUid = null;
-
-
-            resultBox.classList.add(
-                "hidden"
-            );
-
-
-            // ==================================
-            // Firebase Permission
-            // ==================================
-
-            if (
-                error &&
-                error.message &&
-                error.message
-                    .toLowerCase()
-                    .includes(
-                        "permission"
-                    )
-            ) {
-
-                msg.textContent =
-                    "Firebase رفض قراءة البيانات";
-
-            } else {
-
-                msg.textContent =
-                    error.message ||
-                    "حدث خطأ أثناء البحث";
-
-            }
-
-
-        } finally {
-
-
-            searchBtn.disabled =
-                false;
-
-
-            searchBtn.textContent =
-                "بحث";
-
         }
 
-    };
+
+    } finally {
+
+        searchBtn.disabled = false;
+
+        searchBtn.textContent =
+            "بحث";
+    }
+};
 
 
-// ==========================================
-// الضغط على Enter
-// ==========================================
+// ========================================
+// البحث بالضغط على Enter
+// ========================================
 
 accountInput.addEventListener(
     "keydown",
-    function (event) {
+    function(event) {
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
+        if (event.key === "Enter") {
 
             event.preventDefault();
 
             searchBtn.click();
-
         }
-
     }
 );
 
 
-// ==========================================
-// التجديد
-// ==========================================
-//
-// التجديد متوقف في هذه النسخة.
-// لا نعطي الموقع صلاحية كتابة مباشرة
-// في users حتى لا يستطيع أي شخص تعديل
-// الاشتراكات.
-//
+// ========================================
+// زر التجديد
+// ========================================
 
 if (renewBtn) {
 
-    renewBtn.onclick =
-        function () {
+    renewBtn.onclick = function() {
 
-            showDialog(
-                "error",
-                "التجديد",
-                "التجديد غير متاح من هذه الصفحة حالياً."
-            );
-
-        };
-
+        showDialog(
+            "error",
+            "التجديد",
+            "التجديد غير متاح من هذه الصفحة حالياً."
+        );
+    };
 }
+
+
+// ========================================
+// تشغيل تسجيل الدخول تلقائياً
+// ========================================
+
+loginToFirebase();
