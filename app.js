@@ -36,7 +36,7 @@ const WEBSITE_EMAIL =
     "website-reader@bok-ped.com";
 
 const WEBSITE_PASSWORD =
-    "Pedro@123@";
+    "ضع_كلمة_مرور_حساب_الموقع_هنا";
 
 
 // UID الخاص بحساب الموقع
