@@ -1,288 +1,119 @@
 // ==================================================
-// BOK-PED
+// BOK PEDRO
 // البحث عن الحساب + تجديد الاشتراك
+// Firebase: BOK-PEDRO-NEW
 // ==================================================
 
+"use strict";
+
+// ==================================================
+// بيانات حساب الموقع الجديد
+// ==================================================
+
+const WEBSITE_EMAIL = "website-reader@bok-ped.com";
+const WEBSITE_UID = "gL1GGUJ7FWS4zRZmzdaf60qqHMD3";
 
 // ==================================================
 // عناصر الصفحة
 // ==================================================
 
-const searchBtn =
-    document.getElementById("searchBtn");
-
-const renewBtn =
-    document.getElementById("renewBtn");
-
-const accountInput =
-    document.getElementById("account");
-
-const msg =
-    document.getElementById("msg");
-
-const resultBox =
-    document.getElementById("result");
-
+const searchBtn = document.getElementById("searchBtn");
+const renewBtn = document.getElementById("renewBtn");
+const accountInput = document.getElementById("account");
+const msg = document.getElementById("msg");
+const resultBox = document.getElementById("result");
 
 // ==================================================
-// بيانات الحساب الحالي
+// المتغيرات
 // ==================================================
 
 let currentAccount = null;
 let currentUid = null;
+let currentUserData = null;
+
 let firebaseReady = false;
 let loginInProgress = false;
-
-
-// ==================================================
-// بيانات حساب الموقع
-// ==================================================
-
-const WEBSITE_EMAIL =
-    "website-reader@bok-ped.com";
-
-const WEBSITE_PASSWORD =
-    "Pedro@123@";
-
-const WEBSITE_UID =
-    "zuwXPgS4TPYF5GyAYEPEOrsYV0z1";
-
+let searchInProgress = false;
+let renewInProgress = false;
 
 // ==================================================
-// عرض الرسالة
+// الرسائل
 // ==================================================
 
 function setMessage(message) {
-
     if (msg) {
         msg.textContent = message || "";
     }
 }
 
+// ==================================================
+// التحقق من حساب الموقع
+// ==================================================
+
+function isWebsiteUser(user) {
+    return !!(
+        user &&
+        user.uid === WEBSITE_UID &&
+        user.email === WEBSITE_EMAIL
+    );
+}
 
 // ==================================================
-// تسجيل الدخول إلى Firebase
+// التأكد من تسجيل الدخول
 // ==================================================
 
 async function loginToFirebase() {
 
-    // إذا كان الحساب الصحيح مسجلًا بالفعل
-    if (
-        auth.currentUser &&
-        auth.currentUser.uid === WEBSITE_UID &&
-        auth.currentUser.email === WEBSITE_EMAIL
-    ) {
-
-        firebaseReady = true;
-
-        return true;
-    }
-
-
-    // منع تسجيل الدخول المتكرر
     if (loginInProgress) {
         return false;
     }
 
-
     loginInProgress = true;
-
 
     try {
 
-        setMessage(
-            "جاري الاتصال بـ Firebase..."
-        );
+        const user = auth.currentUser;
 
-
-        // تسجيل خروج أي حساب آخر
-        if (auth.currentUser) {
-
-            await auth.signOut();
-        }
-
-
-        // تسجيل الدخول بالحساب المحدد
-        const result =
-            await auth.signInWithEmailAndPassword(
-                WEBSITE_EMAIL,
-                WEBSITE_PASSWORD
-            );
-
-
-        // التأكد من وجود المستخدم
-        if (!result || !result.user) {
-
+        if (!user) {
             firebaseReady = false;
 
             setMessage(
-                "تعذر تسجيل الدخول إلى حساب الموقع."
+                "سجّل الدخول أولاً بحساب الموقع في Firebase Authentication."
             );
 
             return false;
         }
 
-
-        const loggedUser =
-            result.user;
-
-
-        // ==================================================
-        // التحقق من الإيميل
-        // ==================================================
-
-        if (
-            loggedUser.email !==
-            WEBSITE_EMAIL
-        ) {
+        if (!isWebsiteUser(user)) {
 
             firebaseReady = false;
 
-            await auth.signOut();
-
             setMessage(
-                "حساب الموقع المستخدم غير صحيح."
+                "الحساب المسجل ليس حساب الموقع المصرح به."
             );
 
             return false;
         }
-
-
-        // ==================================================
-        // التحقق من UID
-        // ==================================================
-
-        if (
-            loggedUser.uid !==
-            WEBSITE_UID
-        ) {
-
-            firebaseReady = false;
-
-            await auth.signOut();
-
-            setMessage(
-                "حساب الموقع مرتبط بـ UID مختلف في Firebase."
-            );
-
-            return false;
-        }
-
-
-        // ==================================================
-        // نجاح
-        // ==================================================
 
         firebaseReady = true;
 
-        setMessage("");
-
         return true;
-
 
     } catch (error) {
 
+        console.error("Authentication error:", error);
+
         firebaseReady = false;
 
-
-        console.error(
-            "Firebase Login Error:",
-            error
-        );
-
-
-        if (
-            error.code ===
-            "auth/invalid-credential"
-        ) {
-
-            setMessage(
-                "إيميل أو كلمة مرور حساب الموقع غير صحيحة."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/wrong-password"
-        ) {
-
-            setMessage(
-                "كلمة مرور حساب الموقع غير صحيحة."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/user-not-found"
-        ) {
-
-            setMessage(
-                "حساب الموقع غير موجود في Firebase Authentication."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/invalid-email"
-        ) {
-
-            setMessage(
-                "إيميل حساب الموقع غير صحيح."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/too-many-requests"
-        ) {
-
-            setMessage(
-                "تم إيقاف محاولات تسجيل الدخول مؤقتًا. حاول لاحقًا."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/network-request-failed"
-        ) {
-
-            setMessage(
-                "تأكد من اتصال الإنترنت."
-            );
-
-
-        } else if (
-            error.code ===
-            "auth/operation-not-allowed"
-        ) {
-
-            setMessage(
-                "تسجيل الدخول بواسطة Email/Password غير مفعّل."
-            );
-
-
-        } else {
-
-            setMessage(
-                "خطأ Firebase: " +
-                (
-                    error.code ||
-                    error.message ||
-                    "خطأ غير معروف"
-                )
-            );
-        }
-
+        setMessage("تعذر التحقق من تسجيل الدخول.");
 
         return false;
-
 
     } finally {
 
         loginInProgress = false;
     }
 }
-
 
 // ==================================================
 // تنسيق التاريخ
@@ -294,40 +125,45 @@ function formatDate(value) {
         value === null ||
         value === undefined ||
         value === "" ||
-        Number(value) === 0
+        !Number.isFinite(Number(value)) ||
+        Number(value) <= 0
     ) {
-
         return "-";
     }
 
+    const date = new Date(Number(value));
 
-    const date =
-        new Date(Number(value));
-
-
-    if (
-        isNaN(date.getTime())
-    ) {
-
+    if (isNaN(date.getTime())) {
         return "-";
     }
 
-
-    return date.toLocaleString(
-        "ar",
-        {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit"
-        }
-    );
+    return date.toLocaleString("ar", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+    });
 }
 
+// ==================================================
+// إغلاق النوافذ
+// ==================================================
+
+function closeDialog(id) {
+
+    const dialog = document.getElementById(id);
+
+    if (!dialog) {
+        return;
+    }
+
+    dialog.classList.remove("show");
+    dialog.setAttribute("aria-hidden", "true");
+}
 
 // ==================================================
-// Dialog
+// عرض نافذة نجاح أو خطأ
 // ==================================================
 
 function showDialog(
@@ -339,123 +175,11 @@ function showDialog(
     endDate
 ) {
 
-    let dialog;
+    const success = type === "success";
 
-
-    // ==================================================
-    // Dialog النجاح
-    // ==================================================
-
-    if (type === "success") {
-
-        dialog =
-            document.getElementById(
-                "iosSuccessDialog"
-            );
-
-
-        const successTitle =
-            document.getElementById(
-                "successTitle"
-            );
-
-        const successMessage =
-            document.getElementById(
-                "successMessage"
-            );
-
-        const successAccount =
-            document.getElementById(
-                "successAccount"
-            );
-
-        const successSubscription =
-            document.getElementById(
-                "successSubscription"
-            );
-
-        const successEnd =
-            document.getElementById(
-                "successEnd"
-            );
-
-
-        if (successTitle) {
-
-            successTitle.textContent =
-                title || "تمت العملية";
-        }
-
-
-        if (successMessage) {
-
-            successMessage.textContent =
-                message || "";
-        }
-
-
-        if (successAccount) {
-
-            successAccount.textContent =
-                accountNumber || "-";
-        }
-
-
-        if (successSubscription) {
-
-            successSubscription.textContent =
-                subscriptionName || "-";
-        }
-
-
-        if (successEnd) {
-
-            successEnd.textContent =
-                endDate || "-";
-        }
-
-
-    } else {
-
-        // ==================================================
-        // Dialog الخطأ
-        // ==================================================
-
-        dialog =
-            document.getElementById(
-                "iosErrorDialog"
-            );
-
-
-        const errorTitle =
-            document.getElementById(
-                "errorTitle"
-            );
-
-        const errorMessage =
-            document.getElementById(
-                "errorMessage"
-            );
-
-
-        if (errorTitle) {
-
-            errorTitle.textContent =
-                title || "تنبيه";
-        }
-
-
-        if (errorMessage) {
-
-            errorMessage.textContent =
-                message || "";
-        }
-    }
-
-
-    // ==================================================
-    // إذا لم يوجد Dialog
-    // ==================================================
+    const dialog = document.getElementById(
+        success ? "iosSuccessDialog" : "iosErrorDialog"
+    );
 
     if (!dialog) {
 
@@ -468,909 +192,498 @@ function showDialog(
         return;
     }
 
+    if (success) {
 
-    dialog.classList.add("show");
+        const fields = {
+            successTitle: title || "تمت العملية",
+            successMessage: message || "",
+            successAccount: accountNumber || "-",
+            successSubscription: subscriptionName || "-",
+            successEnd: endDate || "-"
+        };
 
-    dialog.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-}
+        Object.keys(fields).forEach(function (id) {
 
+            const element = document.getElementById(id);
 
-// ==================================================
-// إغلاق Dialog
-// ==================================================
+            if (element) {
+                element.textContent = fields[id];
+            }
+        });
 
-function closeDialog(id) {
+    } else {
 
-    const dialog =
-        document.getElementById(id);
+        const errorTitle = document.getElementById("errorTitle");
+        const errorMessage = document.getElementById("errorMessage");
 
+        if (errorTitle) {
+            errorTitle.textContent = title || "تنبيه";
+        }
 
-    if (!dialog) {
-        return;
+        if (errorMessage) {
+            errorMessage.textContent = message || "";
+        }
     }
 
-
-    dialog.classList.remove("show");
-
-    dialog.setAttribute(
-        "aria-hidden",
-        "true"
-    );
+    dialog.classList.add("show");
+    dialog.setAttribute("aria-hidden", "false");
 }
 
-
 // ==================================================
-// أزرار Dialog
+// أزرار النوافذ
 // ==================================================
 
-const successOk =
-    document.getElementById(
-        "successOk"
-    );
-
-const errorOk =
-    document.getElementById(
-        "errorOk"
-    );
-
+const successOk = document.getElementById("successOk");
+const errorOk = document.getElementById("errorOk");
 
 if (successOk) {
-
-    successOk.onclick =
-        function () {
-
-            closeDialog(
-                "iosSuccessDialog"
-            );
-        };
+    successOk.onclick = function () {
+        closeDialog("iosSuccessDialog");
+    };
 }
-
 
 if (errorOk) {
-
-    errorOk.onclick =
-        function () {
-
-            closeDialog(
-                "iosErrorDialog"
-            );
-        };
+    errorOk.onclick = function () {
+        closeDialog("iosErrorDialog");
+    };
 }
 
+// ==================================================
+// معالجة أخطاء Firebase
+// ==================================================
+
+function firebaseErrorMessage(error, defaultMessage) {
+
+    console.error(error);
+
+    const code = error && error.code
+        ? String(error.code)
+        : "";
+
+    const message = error && error.message
+        ? String(error.message)
+        : "";
+
+    if (
+        code === "PERMISSION_DENIED" ||
+        message.toLowerCase().includes("permission_denied") ||
+        message.toLowerCase().includes("permission denied")
+    ) {
+        return "رفضت قواعد Firebase العملية. تحقق من صلاحيات الحساب.";
+    }
+
+    if (code === "NETWORK_ERROR" ||
+        code === "auth/network-request-failed") {
+        return "تحقق من اتصال الإنترنت.";
+    }
+
+    if (message) {
+        return message;
+    }
+
+    return defaultMessage;
+}
 
 // ==================================================
-// البحث عن الحساب
+// البحث عن حساب
+// ==================================================
+
+async function findAccount(number) {
+
+    const accountSnapshot = await database
+        .ref("accountNumbers/" + number)
+        .once("value");
+
+    if (!accountSnapshot.exists()) {
+        throw new Error("رقم الحساب غير موجود.");
+    }
+
+    const accountData = accountSnapshot.val();
+
+    if (!accountData || !accountData.uid) {
+        throw new Error("الحساب غير مرتبط بمستخدم.");
+    }
+
+    const uid = String(accountData.uid);
+
+    const userSnapshot = await database
+        .ref("users/" + uid)
+        .once("value");
+
+    if (!userSnapshot.exists()) {
+        throw new Error("بيانات المستخدم غير موجودة.");
+    }
+
+    return {
+        uid: uid,
+        user: userSnapshot.val() || {}
+    };
+}
+
+// ==================================================
+// عرض بيانات الحساب
+// ==================================================
+
+function displayAccount(number, user) {
+
+    const fields = {
+        rAccount: number,
+        rName: user.username || "-",
+        rActive: user.active === true ? "مفعل" : "غير مفعل",
+        rSub: user.subscriptionName || "-",
+        rStart: formatDate(user.subscriptionStart),
+        rEnd: formatDate(user.subscriptionEnd)
+    };
+
+    Object.keys(fields).forEach(function (id) {
+
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent = fields[id];
+        }
+    });
+
+    if (resultBox) {
+        resultBox.classList.remove("hidden");
+    }
+}
+
+// ==================================================
+// زر البحث
 // ==================================================
 
 if (searchBtn) {
 
-    searchBtn.onclick =
-        async function () {
+    searchBtn.onclick = async function () {
 
-            const number =
-                accountInput.value.trim();
+        if (searchInProgress) {
+            return;
+        }
 
+        const number = accountInput
+            ? accountInput.value.trim()
+            : "";
 
-            // ==================================================
-            // التحقق من رقم الحساب
-            // ==================================================
+        if (!/^[0-9]{7}$/.test(number)) {
 
-            if (
-                !/^[0-9]{7}$/.test(number)
-            ) {
+            setMessage("أدخل رقم حساب مكونًا من 7 أرقام.");
 
-                setMessage(
-                    "أدخل رقم حساب مكون من 7 أرقام"
-                );
-
-
-                resultBox.classList.add(
-                    "hidden"
-                );
-
-
-                currentAccount = null;
-                currentUid = null;
-
-
-                return;
+            if (resultBox) {
+                resultBox.classList.add("hidden");
             }
-
-
-            // ==================================================
-            // تسجيل الدخول
-            // ==================================================
-
-            if (
-                !firebaseReady ||
-                !auth.currentUser ||
-                auth.currentUser.uid !== WEBSITE_UID
-            ) {
-
-                searchBtn.disabled = true;
-
-                searchBtn.textContent =
-                    "جاري الاتصال...";
-
-
-                const loggedIn =
-                    await loginToFirebase();
-
-
-                if (!loggedIn) {
-
-                    searchBtn.disabled =
-                        false;
-
-                    searchBtn.textContent =
-                        "بحث";
-
-                    return;
-                }
-            }
-
-
-            // ==================================================
-            // بداية البحث
-            // ==================================================
-
-            searchBtn.disabled = true;
-
-            searchBtn.textContent =
-                "جاري البحث...";
-
-
-            setMessage("");
-
-            resultBox.classList.add(
-                "hidden"
-            );
-
 
             currentAccount = null;
             currentUid = null;
+            currentUserData = null;
 
+            return;
+        }
 
-            try {
+        searchInProgress = true;
 
-                // ==================================================
-                // accountNumbers
-                // ==================================================
+        searchBtn.disabled = true;
+        searchBtn.textContent = "جاري البحث...";
 
-                const accountRef =
-                    database.ref(
-                        "accountNumbers/" +
-                        number
-                    );
+        try {
 
+            const loggedIn = await loginToFirebase();
 
-                const accountSnapshot =
-                    await accountRef.once(
-                        "value"
-                    );
-
-
-                if (
-                    !accountSnapshot.exists()
-                ) {
-
-                    throw new Error(
-                        "رقم الحساب غير موجود"
-                    );
-                }
-
-
-                const accountData =
-                    accountSnapshot.val();
-
-
-                if (
-                    !accountData ||
-                    !accountData.uid
-                ) {
-
-                    throw new Error(
-                        "الحساب غير مرتبط بمستخدم"
-                    );
-                }
-
-
-                // ==================================================
-                // UID المستخدم
-                // ==================================================
-
-                currentAccount =
-                    number;
-
-                currentUid =
-                    String(
-                        accountData.uid
-                    );
-
-
-                // ==================================================
-                // قراءة المستخدم
-                // ==================================================
-
-                const userRef =
-                    database.ref(
-                        "users/" +
-                        currentUid
-                    );
-
-
-                const userSnapshot =
-                    await userRef.once(
-                        "value"
-                    );
-
-
-                if (
-                    !userSnapshot.exists()
-                ) {
-
-                    throw new Error(
-                        "المستخدم غير موجود"
-                    );
-                }
-
-
-                const user =
-                    userSnapshot.val() || {};
-
-
-                // ==================================================
-                // رقم الحساب
-                // ==================================================
-
-                const rAccount =
-                    document.getElementById(
-                        "rAccount"
-                    );
-
-
-                if (rAccount) {
-
-                    rAccount.textContent =
-                        number;
-                }
-
-
-                // ==================================================
-                // الاسم
-                // ==================================================
-
-                const rName =
-                    document.getElementById(
-                        "rName"
-                    );
-
-
-                if (rName) {
-
-                    rName.textContent =
-                        user.username || "-";
-                }
-
-
-                // ==================================================
-                // الحالة
-                // ==================================================
-
-                const rActive =
-                    document.getElementById(
-                        "rActive"
-                    );
-
-
-                if (rActive) {
-
-                    rActive.textContent =
-                        user.active === true
-                            ? "مفعل"
-                            : "غير مفعل";
-                }
-
-
-                // ==================================================
-                // الاشتراك
-                // ==================================================
-
-                const rSub =
-                    document.getElementById(
-                        "rSub"
-                    );
-
-
-                if (rSub) {
-
-                    rSub.textContent =
-                        user.subscriptionName || "-";
-                }
-
-
-                // ==================================================
-                // البداية
-                // ==================================================
-
-                const rStart =
-                    document.getElementById(
-                        "rStart"
-                    );
-
-
-                if (rStart) {
-
-                    rStart.textContent =
-                        formatDate(
-                            user.subscriptionStart
-                        );
-                }
-
-
-                // ==================================================
-                // النهاية
-                // ==================================================
-
-                const rEnd =
-                    document.getElementById(
-                        "rEnd"
-                    );
-
-
-                if (rEnd) {
-
-                    rEnd.textContent =
-                        formatDate(
-                            user.subscriptionEnd
-                        );
-                }
-
-
-                // ==================================================
-                // إظهار النتيجة
-                // ==================================================
-
-                resultBox.classList.remove(
-                    "hidden"
-                );
-
-
-                setMessage(
-                    "تم العثور على الحساب"
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Firebase search error:",
-                    error
-                );
-
-
-                currentAccount = null;
-                currentUid = null;
-
-
-                resultBox.classList.add(
-                    "hidden"
-                );
-
-
-                if (
-                    error &&
-                    (
-                        error.code ===
-                        "PERMISSION_DENIED" ||
-                        String(error.message || "")
-                            .toLowerCase()
-                            .includes("permission")
-                    )
-                ) {
-
-                    setMessage(
-                        "Firebase رفض قراءة البيانات. تأكد من قواعد Realtime Database."
-                    );
-
-
-                } else {
-
-                    setMessage(
-                        error.message ||
-                        "حدث خطأ أثناء البحث"
-                    );
-                }
-
-
-            } finally {
-
-                searchBtn.disabled = false;
-
-                searchBtn.textContent =
-                    "بحث";
+            if (!loggedIn) {
+                return;
             }
-        };
+
+            setMessage("");
+
+            if (resultBox) {
+                resultBox.classList.add("hidden");
+            }
+
+            currentAccount = null;
+            currentUid = null;
+            currentUserData = null;
+
+            const result = await findAccount(number);
+
+            currentAccount = number;
+            currentUid = result.uid;
+            currentUserData = result.user;
+
+            displayAccount(number, result.user);
+
+            setMessage("تم العثور على الحساب بنجاح.");
+
+        } catch (error) {
+
+            currentAccount = null;
+            currentUid = null;
+            currentUserData = null;
+
+            if (resultBox) {
+                resultBox.classList.add("hidden");
+            }
+
+            setMessage(
+                firebaseErrorMessage(
+                    error,
+                    "حدث خطأ أثناء البحث عن الحساب."
+                )
+            );
+
+        } finally {
+
+            searchInProgress = false;
+
+            searchBtn.disabled = false;
+            searchBtn.textContent = "بحث";
+        }
+    };
 }
 
-
 // ==================================================
-// البحث عند Enter
+// البحث عند الضغط على Enter
 // ==================================================
 
 if (accountInput) {
 
-    accountInput.addEventListener(
-        "keydown",
-        function (event) {
+    accountInput.addEventListener("keydown", function (event) {
 
-            if (
-                event.key === "Enter"
-            ) {
+        if (event.key === "Enter") {
 
-                event.preventDefault();
+            event.preventDefault();
 
-                if (searchBtn) {
-                    searchBtn.click();
-                }
+            if (searchBtn) {
+                searchBtn.click();
             }
         }
-    );
+    });
+
+    accountInput.addEventListener("input", function () {
+
+        this.value = this.value
+            .replace(/[^0-9]/g, "")
+            .slice(0, 7);
+    });
 }
 
+// ==================================================
+// مدد الاشتراك
+// ==================================================
+
+const subscriptionPeriods = {
+
+    "1": {
+        days: 1,
+        name: "يوم واحد",
+        type: "1"
+    },
+
+    "7": {
+        days: 7,
+        name: "7 أيام",
+        type: "7"
+    },
+
+    "30": {
+        days: 30,
+        name: "30 يوم",
+        type: "30"
+    },
+
+    "90": {
+        days: 90,
+        name: "90 يوم",
+        type: "90"
+    },
+
+    "365": {
+        days: 365,
+        name: "12 شهر",
+        type: "365"
+    }
+};
 
 // ==================================================
-// السماح بالأرقام فقط
+// تحديث واجهة الاشتراك
 // ==================================================
 
-if (accountInput) {
+function updateSubscriptionDisplay(
+    accountNumber,
+    user,
+    startTime,
+    endTime,
+    subscriptionName
+) {
 
-    accountInput.addEventListener(
-        "input",
-        function () {
+    user.subscriptionStart = startTime;
+    user.subscriptionEnd = endTime;
+    user.subscriptionName = subscriptionName;
+    user.active = true;
 
-            this.value =
-                this.value
-                    .replace(
-                        /[^0-9]/g,
-                        ""
-                    )
-                    .slice(
-                        0,
-                        7
-                    );
-        }
-    );
+    displayAccount(accountNumber, user);
 }
 
-
 // ==================================================
-// تجديد الاشتراك
+// زر تجديد الاشتراك
 // ==================================================
 
 if (renewBtn) {
 
-    renewBtn.onclick =
-        async function () {
+    renewBtn.onclick = async function () {
 
-            // ==================================================
-            // التأكد من وجود حساب
-            // ==================================================
+        if (renewInProgress) {
+            return;
+        }
 
-            if (
-                !currentAccount ||
-                !currentUid
-            ) {
+        if (!currentAccount || !currentUid) {
 
-                showDialog(
-                    "error",
-                    "تنبيه",
-                    "ابحث عن الحساب أولاً."
+            showDialog(
+                "error",
+                "تنبيه",
+                "ابحث عن الحساب أولاً."
+            );
+
+            return;
+        }
+
+        renewInProgress = true;
+
+        renewBtn.disabled = true;
+
+        const oldText = renewBtn.textContent;
+
+        renewBtn.textContent = "جاري التجديد...";
+
+        try {
+
+            const loggedIn = await loginToFirebase();
+
+            if (!loggedIn) {
+
+                throw new Error(
+                    "سجّل الدخول بحساب الموقع المصرح به أولاً."
                 );
-
-                return;
             }
 
+            const periodElement = document.getElementById("period");
 
-            // ==================================================
-            // التأكد من تسجيل الدخول
-            // ==================================================
+            const period = periodElement
+                ? periodElement.value
+                : "1";
 
-            if (
-                !auth.currentUser ||
-                auth.currentUser.uid !== WEBSITE_UID
-            ) {
-
-                const loggedIn =
-                    await loginToFirebase();
-
-
-                if (!loggedIn) {
-
-                    showDialog(
-                        "error",
-                        "خطأ",
-                        "تعذر الاتصال بحساب الموقع."
-                    );
-
-                    return;
-                }
-            }
-
-
-            // ==================================================
-            // مدة الاشتراك
-            // ==================================================
-
-            const periodElement =
-                document.getElementById(
-                    "period"
-                );
-
-
-            const period =
-                periodElement
-                    ? periodElement.value
-                    : "1";
-
-
-            const periods = {
-
-                "1": {
-                    days: 1,
-                    name: "يوم واحد",
-                    type: "1"
-                },
-
-                "7": {
-                    days: 7,
-                    name: "7 أيام",
-                    type: "7"
-                },
-
-                "30": {
-                    days: 30,
-                    name: "30 يوم",
-                    type: "30"
-                },
-
-                "90": {
-                    days: 90,
-                    name: "90 يوم",
-                    type: "90"
-                },
-
-                "365": {
-                    days: 365,
-                    name: "12 شهر",
-                    type: "365"
-                }
-
-            };
-
-
-            const selected =
-                periods[period];
-
+            const selected = subscriptionPeriods[period];
 
             if (!selected) {
-
-                showDialog(
-                    "error",
-                    "خطأ",
-                    "مدة الاشتراك غير صحيحة."
-                );
-
-                return;
+                throw new Error("مدة الاشتراك غير صحيحة.");
             }
 
+            // إعادة قراءة بيانات الحساب قبل التجديد
+            const userRef = database.ref("users/" + currentUid);
 
-            // ==================================================
-            // منع الضغط المتكرر
-            // ==================================================
+            const snapshot = await userRef.once("value");
 
-            renewBtn.disabled = true;
-
-
-            const oldText =
-                renewBtn.textContent;
-
-
-            renewBtn.textContent =
-                "جاري التجديد...";
-
-
-            try {
-
-                // ==================================================
-                // قراءة المستخدم
-                // ==================================================
-
-                const userRef =
-                    database.ref(
-                        "users/" +
-                        currentUid
-                    );
-
-
-                const snapshot =
-                    await userRef.once(
-                        "value"
-                    );
-
-
-                if (
-                    !snapshot.exists()
-                ) {
-
-                    throw new Error(
-                        "بيانات المستخدم غير موجودة."
-                    );
-                }
-
-
-                const user =
-                    snapshot.val() || {};
-
-
-                // ==================================================
-                // الوقت الحالي
-                // ==================================================
-
-                const now =
-                    Date.now();
-
-
-                // ==================================================
-                // النهاية الحالية
-                // ==================================================
-
-                const oldEnd =
-                    Number(
-                        user.subscriptionEnd || 0
-                    );
-
-
-                // ==================================================
-                // بداية التجديد
-                // ==================================================
-
-                let startTime;
-
-
-                if (
-                    oldEnd > now
-                ) {
-
-                    startTime =
-                        oldEnd;
-
-                } else {
-
-                    startTime =
-                        now;
-                }
-
-
-                // ==================================================
-                // حساب المدة
-                // ==================================================
-
-                const duration =
-                    selected.days *
-                    24 *
-                    60 *
-                    60 *
-                    1000;
-
-
-                // ==================================================
-                // النهاية الجديدة
-                // ==================================================
-
-                const newEnd =
-                    startTime +
-                    duration;
-
-
-                // ==================================================
-                // تحديث Firebase
-                // ==================================================
-
-                await userRef.update({
-
-                    subscriptionStart:
-                        startTime,
-
-                    subscriptionEnd:
-                        newEnd,
-
-                    subscriptionName:
-                        selected.name,
-
-                    subscriptionType:
-                        selected.type,
-
-                    active:
-                        true
-                });
-
-
-                // ==================================================
-                // تحديث الشاشة
-                // ==================================================
-
-                const rSub =
-                    document.getElementById(
-                        "rSub"
-                    );
-
-
-                if (rSub) {
-
-                    rSub.textContent =
-                        selected.name;
-                }
-
-
-                const rStart =
-                    document.getElementById(
-                        "rStart"
-                    );
-
-
-                if (rStart) {
-
-                    rStart.textContent =
-                        formatDate(
-                            startTime
-                        );
-                }
-
-
-                const rEnd =
-                    document.getElementById(
-                        "rEnd"
-                    );
-
-
-                if (rEnd) {
-
-                    rEnd.textContent =
-                        formatDate(
-                            newEnd
-                        );
-                }
-
-
-                const rActive =
-                    document.getElementById(
-                        "rActive"
-                    );
-
-
-                if (rActive) {
-
-                    rActive.textContent =
-                        "مفعل";
-                }
-
-
-                // ==================================================
-                // نجاح
-                // ==================================================
-
-                showDialog(
-                    "success",
-                    "تم التجديد",
-                    "تم تجديد الاشتراك بنجاح.",
-                    currentAccount,
-                    selected.name,
-                    formatDate(newEnd)
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Renew error:",
-                    error
-                );
-
-
-                let message =
-                    "تعذر تجديد الاشتراك.";
-
-
-                if (
-                    error &&
-                    (
-                        error.code ===
-                        "PERMISSION_DENIED" ||
-                        String(error.message || "")
-                            .toLowerCase()
-                            .includes("permission")
-                    )
-                ) {
-
-                    message =
-                        "ليس لديك صلاحية لتجديد الاشتراك.";
-
-                } else if (
-                    error &&
-                    error.message
-                ) {
-
-                    message =
-                        error.message;
-                }
-
-
-                showDialog(
-                    "error",
-                    "تعذر التجديد",
-                    message
-                );
-
-
-            } finally {
-
-                renewBtn.disabled = false;
-
-                renewBtn.textContent =
-                    oldText;
+            if (!snapshot.exists()) {
+                throw new Error("بيانات المستخدم غير موجودة.");
             }
-        };
+
+            const user = snapshot.val() || {};
+
+            const now = Date.now();
+
+            const oldEnd = Number(user.subscriptionEnd || 0);
+
+            // إذا كان الاشتراك فعالاً، تُضاف المدة بعد نهايته.
+            // وإذا انتهى، يبدأ الاشتراك من الوقت الحالي.
+            const startTime = oldEnd > now ? oldEnd : now;
+
+            const duration =
+                selected.days * 24 * 60 * 60 * 1000;
+
+            const newEnd = startTime + duration;
+
+            if (!Number.isFinite(newEnd)) {
+                throw new Error("تعذر حساب نهاية الاشتراك.");
+            }
+
+            // تحديث بيانات الاشتراك
+            await userRef.update({
+
+                subscriptionStart: startTime,
+                subscriptionEnd: newEnd,
+                subscriptionName: selected.name,
+                subscriptionType: selected.type,
+                active: true
+
+            });
+
+            // تحديث بيانات الشاشة
+            updateSubscriptionDisplay(
+                currentAccount,
+                user,
+                startTime,
+                newEnd,
+                selected.name
+            );
+
+            currentUserData = user;
+
+            showDialog(
+                "success",
+                "تم التجديد",
+                "تم تجديد الاشتراك بنجاح.",
+                currentAccount,
+                selected.name,
+                formatDate(newEnd)
+            );
+
+            setMessage("تم تجديد الاشتراك بنجاح.");
+
+        } catch (error) {
+
+            showDialog(
+                "error",
+                "تعذر التجديد",
+                firebaseErrorMessage(
+                    error,
+                    "تعذر تجديد الاشتراك."
+                )
+            );
+
+        } finally {
+
+            renewInProgress = false;
+
+            renewBtn.disabled = false;
+            renewBtn.textContent = oldText;
+        }
+    };
 }
-
 
 // ==================================================
 // مراقبة تسجيل الدخول
 // ==================================================
 
-auth.onAuthStateChanged(
-    function (user) {
+auth.onAuthStateChanged(function (user) {
 
-        if (!user) {
+    firebaseReady = isWebsiteUser(user);
 
-            firebaseReady = false;
+    if (firebaseReady) {
 
-            return;
-        }
+        setMessage("");
 
+    } else if (user) {
 
-        // الحساب الصحيح
-        if (
-            user.uid === WEBSITE_UID &&
-            user.email === WEBSITE_EMAIL
-        ) {
+        setMessage(
+            "الحساب المسجل لا يطابق حساب الموقع المصرح به."
+        );
 
-            firebaseReady = true;
+    } else {
 
-            return;
-        }
-
-
-        // أي حساب آخر يتم تسجيل خروجه
-        firebaseReady = false;
-
-
-        auth.signOut()
-            .catch(
-                function (error) {
-
-                    console.error(
-                        "Sign out error:",
-                        error
-                    );
-                }
-            );
+        setMessage(
+            "يرجى تسجيل الدخول بحساب الموقع قبل البحث."
+        );
     }
-);
-
+});
 
 // ==================================================
 // نهاية app.js
