@@ -1,131 +1,274 @@
+"use strict";
+
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
 
-// =========================
-// Firebase Admin
-// =========================
+// ==================================================
+// BOK PEDRO
+// Firebase Project: BOK-PEDRO-NEW
+// ==================================================
+
+const DATABASE_URL =
+    "https://bok-pedro-new-default-rtdb.firebaseio.com";
+
+const WEBSITE_UID =
+    "gL1GGUJ7FWS4zRZmzdaf60qqHMD3";
+
+// ==================================================
+// التحقق من إعدادات Firebase
+// ==================================================
 
 if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-    console.error("FIREBASE_SERVICE_ACCOUNT is missing");
+    console.error(
+        "FIREBASE_SERVICE_ACCOUNT is missing"
+    );
+
     process.exit(1);
 }
 
 let serviceAccount;
 
 try {
-    serviceAccount =
-        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    serviceAccount = JSON.parse(
+        process.env.FIREBASE_SERVICE_ACCOUNT
+    );
 } catch (error) {
-    console.error("Invalid FIREBASE_SERVICE_ACCOUNT");
+    console.error(
+        "Invalid FIREBASE_SERVICE_ACCOUNT JSON"
+    );
+
     process.exit(1);
 }
 
+// ==================================================
+// التأكد من أن ملف الخدمة تابع للمشروع الجديد
+// ==================================================
+
+if (
+    serviceAccount.project_id !== "bok-pedro-new"
+) {
+    console.error(
+        "Firebase service account does not belong to bok-pedro-new"
+    );
+
+    process.exit(1);
+}
+
+// ==================================================
+// تهيئة Firebase Admin
+// ==================================================
+
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL:
-        "https://bok-ped-default-rtdb.firebaseio.com"
+    databaseURL: DATABASE_URL
 });
 
 const db = admin.database();
 
 const app = express();
 
+app.disable("x-powered-by");
+
 app.use(cors());
-app.use(express.json());
 
+app.use(express.json({
+    limit: "20kb"
+}));
 
-// =========================
-// الصفحة الرئيسية / فحص السيرفر
-// =========================
+// ==================================================
+// أدوات مساعدة
+// ==================================================
+
+function sendError(res, status, message) {
+    return res.status(status).json({
+        success: false,
+        error: message
+    });
+}
+
+function validAccount(number) {
+    return /^[0-9]{7}$/.test(number);
+}
+
+function getSubscription(period) {
+
+    const periods = {
+        "1": {
+            days: 1,
+            name: "يوم واحد",
+            type: "day"
+        },
+
+        "7": {
+            days: 7,
+            name: "أسبوع واحد",
+            type: "week"
+        },
+
+        "30": {
+            days: 30,
+            name: "شهر واحد",
+            type: "month"
+        },
+
+        "90": {
+            days: 90,
+            name: "3 شهور",
+            type: "3months"
+        },
+
+        "365": {
+            days: 365,
+            name: "12 شهر",
+            type: "12months"
+        }
+    };
+
+    return periods[period] || null;
+}
+
+// ==================================================
+// التحقق من هوية المستخدم
+// ==================================================
+
+async function authenticateWebsite(req, res, next) {
+
+    try {
+
+        const authorization =
+            req.headers.authorization || "";
+
+        const match = authorization.match(
+            /^Bearer\s+(.+)$/i
+        );
+
+        if (!match) {
+            return sendError(
+                res,
+                401,
+                "يجب تسجيل الدخول أولاً."
+            );
+        }
+
+        const idToken = match[1];
+
+        const decodedToken =
+            await admin.auth().verifyIdToken(idToken);
+
+        // السماح لحساب الموقع المحدد فقط
+        if (decodedToken.uid !== WEBSITE_UID) {
+
+            return sendError(
+                res,
+                403,
+                "ليس لديك صلاحية لتنفيذ هذه العملية."
+            );
+        }
+
+        req.websiteUser = decodedToken;
+
+        next();
+
+    } catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error.message
+        );
+
+        return sendError(
+            res,
+            401,
+            "جلسة الدخول غير صالحة. سجّل الدخول مجددًا."
+        );
+    }
+}
+
+// ==================================================
+// الصفحة الرئيسية وفحص الخادم
+// ==================================================
 
 app.get("/api", function(req, res) {
+
     res.json({
         success: true,
-        message: "BOK Backend is running"
+        message: "BOK PEDRO Backend is running",
+        project: "bok-pedro-new"
     });
 });
 
-
-// =========================
-// البحث عن الحساب
-// =========================
+// ==================================================
+// البحث عن حساب
+// ==================================================
 
 app.get(
     "/api/account/:number",
+    authenticateWebsite,
     async function(req, res) {
 
         try {
 
             const number =
-                String(req.params.number).trim();
+                String(req.params.number || "").trim();
 
-            if (!/^[0-9]{7}$/.test(number)) {
+            if (!validAccount(number)) {
 
-                return res.status(400).json({
-                    error:
-                        "رقم الحساب يجب أن يكون 7 أرقام"
-                });
+                return sendError(
+                    res,
+                    400,
+                    "رقم الحساب يجب أن يتكون من 7 أرقام."
+                );
             }
 
-
-            // البحث في accountNumbers
-
-            const accountSnap =
-                await db
-                    .ref("accountNumbers/" + number)
-                    .once("value");
-
+            // قراءة ربط رقم الحساب بالمستخدم
+            const accountSnap = await db
+                .ref("accountNumbers/" + number)
+                .once("value");
 
             if (!accountSnap.exists()) {
 
-                return res.status(404).json({
-                    error:
-                        "رقم الحساب غير موجود"
-                });
+                return sendError(
+                    res,
+                    404,
+                    "رقم الحساب غير موجود."
+                );
             }
-
 
             const accountData =
                 accountSnap.val();
 
+            if (
+                !accountData ||
+                !accountData.uid
+            ) {
 
-            if (!accountData ||
-                !accountData.uid) {
-
-                return res.status(400).json({
-                    error:
-                        "الحساب غير مرتبط بمستخدم"
-                });
+                return sendError(
+                    res,
+                    400,
+                    "الحساب غير مرتبط بمستخدم."
+                );
             }
 
+            const uid = String(accountData.uid);
 
-            const uid =
-                String(accountData.uid);
-
-
-            // جلب بيانات المستخدم
-
-            const userSnap =
-                await db
-                    .ref("users/" + uid)
-                    .once("value");
-
+            // قراءة بيانات المستخدم
+            const userSnap = await db
+                .ref("users/" + uid)
+                .once("value");
 
             if (!userSnap.exists()) {
 
-                return res.status(404).json({
-                    error:
-                        "المستخدم غير موجود"
-                });
+                return sendError(
+                    res,
+                    404,
+                    "المستخدم غير موجود."
+                );
             }
 
+            const user = userSnap.val() || {};
 
-            const user =
-                userSnap.val() || {};
-
-
-            res.json({
+            return res.json({
 
                 success: true,
 
@@ -137,7 +280,7 @@ app.get(
                     user.username || "",
 
                 active:
-                    !!user.active,
+                    user.active === true,
 
                 subscriptionName:
                     user.subscriptionName || "",
@@ -146,14 +289,10 @@ app.get(
                     user.subscriptionType || "",
 
                 subscriptionStart:
-                    Number(
-                        user.subscriptionStart
-                    ) || 0,
+                    Number(user.subscriptionStart) || 0,
 
                 subscriptionEnd:
-                    Number(
-                        user.subscriptionEnd
-                    ) || 0
+                    Number(user.subscriptionEnd) || 0
 
             });
 
@@ -164,265 +303,164 @@ app.get(
                 error
             );
 
-            res.status(500).json({
-                error:
-                    "حدث خطأ في الخادم"
-            });
+            return sendError(
+                res,
+                500,
+                "حدث خطأ أثناء البحث عن الحساب."
+            );
         }
     }
 );
 
-
-// =========================
+// ==================================================
 // تجديد الاشتراك
-// =========================
+// ==================================================
 
 app.post(
     "/api/renew",
+    authenticateWebsite,
     async function(req, res) {
 
         try {
 
             const account =
-                String(
-                    req.body.account || ""
-                ).trim();
+                String(req.body.account || "").trim();
 
             const period =
-                String(
-                    req.body.period || ""
+                String(req.body.period || "");
+
+            if (!validAccount(account)) {
+
+                return sendError(
+                    res,
+                    400,
+                    "رقم الحساب يجب أن يتكون من 7 أرقام."
                 );
-
-
-            // التحقق من رقم الحساب
-
-            if (!/^[0-9]{7}$/.test(account)) {
-
-                return res.status(400).json({
-                    error:
-                        "رقم الحساب يجب أن يكون 7 أرقام"
-                });
             }
 
+            const selected =
+                getSubscription(period);
 
-            // المدد المسموحة
+            if (!selected) {
 
-            const allowed = [
-                "1",
-                "7",
-                "30",
-                "90",
-                "365"
-            ];
-
-
-            if (!allowed.includes(period)) {
-
-                return res.status(400).json({
-                    error:
-                        "مدة الاشتراك غير صحيحة"
-                });
+                return sendError(
+                    res,
+                    400,
+                    "مدة الاشتراك غير صحيحة."
+                );
             }
 
-
-            // =========================
-            // استخراج UID من Firebase
-            // =========================
-
-            const accountSnap =
-                await db
-                    .ref("accountNumbers/" + account)
-                    .once("value");
-
+            // البحث عن الحساب
+            const accountSnap = await db
+                .ref("accountNumbers/" + account)
+                .once("value");
 
             if (!accountSnap.exists()) {
 
-                return res.status(404).json({
-                    error:
-                        "رقم الحساب غير موجود"
-                });
+                return sendError(
+                    res,
+                    404,
+                    "رقم الحساب غير موجود."
+                );
             }
-
 
             const accountData =
                 accountSnap.val();
 
+            if (
+                !accountData ||
+                !accountData.uid
+            ) {
 
-            if (!accountData ||
-                !accountData.uid) {
-
-                return res.status(400).json({
-                    error:
-                        "الحساب غير مرتبط بمستخدم"
-                });
+                return sendError(
+                    res,
+                    400,
+                    "الحساب غير مرتبط بمستخدم."
+                );
             }
 
-
-            const uid =
-                String(accountData.uid);
-
+            const uid = String(accountData.uid);
 
             const userRef =
                 db.ref("users/" + uid);
 
-
-            const snap =
+            // قراءة بيانات الاشتراك الحالية
+            const userSnap =
                 await userRef.once("value");
 
+            if (!userSnap.exists()) {
 
-            if (!snap.exists()) {
-
-                return res.status(404).json({
-                    error:
-                        "المستخدم غير موجود"
-                });
+                return sendError(
+                    res,
+                    404,
+                    "المستخدم غير موجود."
+                );
             }
-
 
             const user =
-                snap.val() || {};
+                userSnap.val() || {};
 
-
-            // =========================
-            // حساب تاريخ البداية
-            // =========================
-
-            const now =
-                Date.now();
-
+            const now = Date.now();
 
             const oldEnd =
-                Number(
-                    user.subscriptionEnd
-                ) || 0;
+                Number(user.subscriptionEnd) || 0;
 
-
-            /*
-             إذا الاشتراك الحالي ما زال ساريًا:
-             نبدأ من تاريخ النهاية القديمة.
-
-             إذا كان منتهيًا:
-             نبدأ من الوقت الحالي.
-            */
-
+            // المحافظة على المدة المتبقية
             const start =
-                oldEnd > now
-                    ? oldEnd
-                    : now;
+                oldEnd > now ? oldEnd : now;
 
+            const duration =
+                selected.days *
+                24 *
+                60 *
+                60 *
+                1000;
 
-            let end;
+            const end = start + duration;
 
+            if (
+                !Number.isFinite(start) ||
+                !Number.isFinite(end) ||
+                end <= now
+            ) {
 
-            // =========================
-            // حساب تاريخ النهاية
-            // =========================
-
-            if (period === "1") {
-
-                end =
-                    start +
-                    (1 * 24 * 60 * 60 * 1000);
-
-            } else if (period === "7") {
-
-                end =
-                    start +
-                    (7 * 24 * 60 * 60 * 1000);
-
-            } else if (period === "30") {
-
-                end =
-                    start +
-                    (30 * 24 * 60 * 60 * 1000);
-
-            } else if (period === "90") {
-
-                end =
-                    start +
-                    (90 * 24 * 60 * 60 * 1000);
-
-            } else if (period === "365") {
-
-                end =
-                    start +
-                    (365 * 24 * 60 * 60 * 1000);
+                return sendError(
+                    res,
+                    400,
+                    "تعذر حساب تاريخ انتهاء الاشتراك."
+                );
             }
 
-
-            let type = "";
-            let name = "";
-
-
-            if (period === "1") {
-
-                type = "day";
-                name = "يوم واحد";
-
-            } else if (period === "7") {
-
-                type = "week";
-                name = "أسبوع واحد";
-
-            } else if (period === "30") {
-
-                type = "month";
-                name = "شهر واحد";
-
-            } else if (period === "90") {
-
-                type = "3months";
-                name = "3 شهور";
-
-            } else if (period === "365") {
-
-                type = "12months";
-                name = "12 شهر";
-            }
-
-
-            // =========================
-            // تحديث Firebase
-            // =========================
-
+            // تحديث بيانات المستخدم
             await userRef.update({
 
                 active: true,
 
-                subscriptionStart:
-                    start,
+                subscriptionStart: start,
 
-                subscriptionEnd:
-                    end,
+                subscriptionEnd: end,
 
-                subscriptionType:
-                    type,
+                subscriptionType: selected.type,
 
-                subscriptionName:
-                    name
+                subscriptionName: selected.name,
+
+                updatedAt: now
 
             });
 
-
-            // =========================
-            // الرد
-            // =========================
-
-            res.json({
+            return res.json({
 
                 success: true,
 
-                accountNumber:
-                    account,
+                accountNumber: account,
 
-                uid:
-                    uid,
+                uid: uid,
 
                 subscriptionName:
-                    name,
+                    selected.name,
 
                 subscriptionType:
-                    type,
+                    selected.type,
 
                 subscriptionStart:
                     start,
@@ -439,31 +477,70 @@ app.post(
                 error
             );
 
-            res.status(500).json({
-                error:
-                    "فشل تجديد الاشتراك"
-            });
+            return sendError(
+                res,
+                500,
+                "فشل تجديد الاشتراك."
+            );
         }
     }
 );
 
+// ==================================================
+// معالجة المسارات غير الموجودة
+// ==================================================
 
-// =========================
-// تشغيل السيرفر
-// =========================
+app.use(function(req, res) {
+
+    return sendError(
+        res,
+        404,
+        "المسار المطلوب غير موجود."
+    );
+});
+
+// ==================================================
+// معالجة أخطاء JSON
+// ==================================================
+
+app.use(function(error, req, res, next) {
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    if (error instanceof SyntaxError && error.status === 400) {
+
+        return sendError(
+            res,
+            400,
+            "بيانات JSON المرسلة غير صحيحة."
+        );
+    }
+
+    console.error("Server error:", error);
+
+    return sendError(
+        res,
+        500,
+        "حدث خطأ داخلي في الخادم."
+    );
+});
+
+// ==================================================
+// تشغيل الخادم
+// ==================================================
 
 const PORT =
     process.env.PORT || 3000;
 
+app.listen(PORT, function() {
 
-app.listen(
-    PORT,
-    function() {
+    console.log(
+        "BOK PEDRO Backend running on port " + PORT
+    );
 
-        console.log(
-            "BOK Backend running on port " +
-            PORT
-        );
-
-    }
-);
+    console.log(
+        "Firebase project: bok-pedro-new"
+    );
+});
